@@ -48,15 +48,18 @@ class AuthController extends StateNotifier<AuthState> {
   final _patientApi = PatientApi();
 
   Future<void> _bootstrap() async {
-    final token = await TokenStorage.instance.accessToken;
-    if (token == null) {
-      state = const AuthState.unauthenticated();
-      return;
-    }
     try {
-      final user = await _api.fetchCurrentUser();
+      final token = await TokenStorage.instance.accessToken
+          .timeout(const Duration(milliseconds: 1500), onTimeout: () => null);
+      if (token == null) {
+        state = const AuthState.unauthenticated();
+        return;
+      }
+      final user = await _api.fetchCurrentUser()
+          .timeout(const Duration(milliseconds: 2500));
       if (user.role == UserRole.patient) {
-        final profile = await _patientApi.getMyProfile();
+        final profile = await _patientApi.getMyProfile()
+            .timeout(const Duration(milliseconds: 2000));
         if (profile == null) {
           state = AuthState.needsProfileSetup(user);
         } else {

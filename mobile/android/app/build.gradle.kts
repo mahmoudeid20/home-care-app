@@ -25,8 +25,8 @@ android {
         applicationId = "com.sanad.care"
         minSdk = flutter.minSdkVersion
         targetSdk = 34
-        versionCode = 4
-        versionName = "1.0.3"
+        versionCode = 5
+        versionName = "1.0.4"
     }
 
     buildTypes {

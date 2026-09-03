@@ -27,26 +27,15 @@ class _RootShellState extends ConsumerState<RootShell> {
     final role = ref.watch(authControllerProvider).user?.role;
     final isNurse = role == UserRole.nurse;
 
-    final tabs = <int, Widget>{};
-    Widget buildTab(int index) {
-      return tabs.putIfAbsent(index, () => switch (index) {
-        0 => isNurse ? const ReceivedRequestsScreen() : const HomeScreen(),
-        1 => const BookingsScreen(),
-        2 => const ChatListScreen(),
-        3 => const SettingsScreen(),
-        _ => const SizedBox.shrink(),
-      });
-    }
-
     return Scaffold(
       body: SafeArea(
         child: IndexedStack(
           index: _index,
           children: [
-            buildTab(0),
-            if (_index >= 1) buildTab(1) else const SizedBox.shrink(),
-            if (_index >= 2 || tabs.containsKey(2)) buildTab(2) else const SizedBox.shrink(),
-            if (_index >= 3 || tabs.containsKey(3)) buildTab(3) else const SizedBox.shrink(),
+            isNurse ? const ReceivedRequestsScreen() : const HomeScreen(),
+            const BookingsScreen(),
+            const ChatListScreen(),
+            const SettingsScreen(),
           ],
         ),
       ),

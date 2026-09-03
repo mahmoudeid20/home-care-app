@@ -15,25 +15,31 @@ import 'support_screen.dart';
 final _searchQueryProvider = StateProvider<String>((ref) => '');
 final _selectedSpecialtyFilterProvider = StateProvider<String>((ref) => '');
 
-final _nurseSearchProvider = FutureProvider.autoDispose((ref) async {
+final _rawNursesProvider = FutureProvider<List<NurseSummary>>((ref) async {
+  return NurseApi().search();
+});
+
+final _nurseSearchProvider = Provider<AsyncValue<List<NurseSummary>>>((ref) {
   final query = ref.watch(_searchQueryProvider).trim().toLowerCase();
   final specialtyFilter = ref.watch(_selectedSpecialtyFilterProvider);
-  final nurses = await NurseApi().search();
+  final rawAsync = ref.watch(_rawNursesProvider);
 
-  return nurses.where((n) {
-    // Search query filter
-    final name = n.fullName.toLowerCase();
-    final title = n.professionalTitle?.toLowerCase() ?? '';
-    final matchesQuery = query.isEmpty || name.contains(query) || title.contains(query);
+  return rawAsync.whenData((nurses) {
+    return nurses.where((n) {
+      // Search query filter
+      final name = n.fullName.toLowerCase();
+      final title = n.professionalTitle?.toLowerCase() ?? '';
+      final matchesQuery = query.isEmpty || name.contains(query) || title.contains(query);
 
-    // Specialty filter
-    final matchesSpecialty = specialtyFilter.isEmpty ||
-        specialtyFilter == 'الكل' ||
-        (n.professionalTitle?.contains(specialtyFilter) ?? false) ||
-        name.contains(specialtyFilter);
+      // Specialty filter
+      final matchesSpecialty = specialtyFilter.isEmpty ||
+          specialtyFilter == 'الكل' ||
+          (n.professionalTitle?.contains(specialtyFilter) ?? false) ||
+          name.contains(specialtyFilter);
 
-    return matchesQuery && matchesSpecialty;
-  }).toList();
+      return matchesQuery && matchesSpecialty;
+    }).toList();
+  });
 });
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -78,7 +84,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
     return RefreshIndicator(
       color: AppColors.primary,
-      onRefresh: () async => ref.invalidate(_nurseSearchProvider),
+      onRefresh: () async => ref.invalidate(_rawNursesProvider),
       child: CustomScrollView(
         slivers: [
           // Top Bar & Welcome Header

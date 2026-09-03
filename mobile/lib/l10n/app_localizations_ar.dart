@@ -9,7 +9,7 @@ class AppLocalizationsAr extends AppLocalizations {
   AppLocalizationsAr([String locale = 'ar']) : super(locale);
 
   @override
-  String get brandName => 'سَنَد';
+  String get brandName => 'Home Care';
 
   @override
   String get brandSub => 'رعاية منزلية موثوقة';
@@ -461,7 +461,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get onboardingSub2 =>
-      'جميع ممرضي سَنَد تم التحقق من هوياتهم وشهاداتهم وتراخيص مزاولة المهنة بعناية تامة.';
+      'جميع ممرضي Home Care تم التحقق من هوياتهم وشهاداتهم وتراخيص مزاولة المهنة بعناية تامة.';
 
   @override
   String get onboardingTitle3 => 'سهولة في الحجز والمتابعة';

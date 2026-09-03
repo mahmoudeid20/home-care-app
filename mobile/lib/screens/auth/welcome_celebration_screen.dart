@@ -137,7 +137,7 @@ class WelcomeCelebrationScreen extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        'ابدأ استخدام سَنَد الآن',
+                        'ابدأ استخدام Home Care الآن',
                         style: GoogleFonts.cairo(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

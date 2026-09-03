@@ -149,7 +149,7 @@ class _NurseDocumentsUploadScreenState extends State<NurseDocumentsUploadScreen>
                       const SizedBox(width: 12),
                       Expanded(
                         child: Text(
-                          'تساعد هذه المستندات إدارة "سَنَد" في التحقق من كفاءتك ومنحك شارة "ممرض معتمد" وفتح الحجوزات لحسابك.',
+                          'تساعد هذه المستندات إدارة "Home Care" في التحقق من كفاءتك ومنحك شارة "ممرض معتمد" وفتح الحجوزات لحسابك.',
                           style: GoogleFonts.cairo(fontSize: 13, color: AppColors.ink),
                         ),
                       ),

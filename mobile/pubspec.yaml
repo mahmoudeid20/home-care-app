@@ -50,21 +50,17 @@ flutter_launcher_icons:
   android: true
   ios: false
   image_path: "assets/icons/app_icon.png"
-  adaptive_icon_background: "#073B35"
+  adaptive_icon_background: "#0D47A1"
   adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
   remove_alpha_ios: true
 
-# Native splash screen (shown before Flutter's own engine/first frame is
-# ready — different from lib/screens/splash_screen.dart, which is the
-# in-Flutter screen shown *after* that, while auth bootstrap runs). Run:
-#   dart run flutter_native_splash:create
 flutter_native_splash:
-  color: "#FAFAF8"
+  color: "#FFFFFF"
   image: "assets/icons/app_icon_foreground.png"
-  color_dark: "#073B35"
+  color_dark: "#0D47A1"
   image_dark: "assets/icons/app_icon_foreground.png"
   android_12:
     image: "assets/icons/app_icon_foreground.png"
-    icon_background_color: "#FAFAF8"
+    icon_background_color: "#FFFFFF"
     image_dark: "assets/icons/app_icon_foreground.png"
-    icon_background_color_dark: "#073B35"
+    icon_background_color_dark: "#0D47A1"

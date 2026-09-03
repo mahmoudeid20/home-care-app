@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get brandName => 'Sanad';
+  String get brandName => 'Home Care';
 
   @override
   String get brandSub => 'Trusted home care';

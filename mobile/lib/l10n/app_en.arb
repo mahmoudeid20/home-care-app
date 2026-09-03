@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "brandName": "Sanad",
+  "brandName": "Home Care",
   "brandSub": "Trusted home care",
   "homeGreeting": "Hi {name} 👋",
   "@homeGreeting": { "placeholders": { "name": {"type": "String"} } },

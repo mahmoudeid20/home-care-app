@@ -79,7 +79,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'ميثاق سَنَد الطبي المعتمد 2026',
+                            'ميثاق Home Care الطبي المعتمد 2026',
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -112,13 +112,13 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                         children: [
                           _buildSectionTitle('1. سرية وأمان البيانات الطبية'),
                           _buildSectionBody(
-                            'يلتزم تطبيق "سَنَد" بأعلى معايير التشفير والحماية لبيانات المرضى والممرضين وفقاً لقانون حماية البيانات الشخصية المصري. لا يتم مشاركة السجلات الطبية أو العناوين إلا مع أطراف الخدمة المصرح لهم أثناء الحجز فقط.',
+                            'يلتزم تطبيق "Home Care" بأعلى معايير التشفير والحماية لبيانات المرضى والممرضين وفقاً لقانون حماية البيانات الشخصية المصري. لا يتم مشاركة السجلات الطبية أو العناوين إلا مع أطراف الخدمة المصرح لهم أثناء الحجز فقط.',
                           ),
                           const SizedBox(height: 14),
 
                           _buildSectionTitle('2. إخلاء المسؤولية للحالات الطارئة'),
                           _buildSectionBody(
-                            'تطبيق "سَنَد" مخصص لخدمات الرعاية والتمريض المنزلي المجدولة وغير الطارئة. في حال وجود حالات حرجة أو طوارئ تستدعي التدخل الفوري، يجب الاتصال بالإسعاف المصري (123) مباشرة أو التوجه لأقرب مستشفى طوارئ.',
+                            'تطبيق "Home Care" مخصص لخدمات الرعاية والتمريض المنزلي المجدولة وغير الطارئة. في حال وجود حالات حرجة أو طوارئ تستدعي التدخل الفوري، يجب الاتصال بالإسعاف المصري (123) مباشرة أو التوجه لأقرب مستشفى طوارئ.',
                           ),
                           const SizedBox(height: 14),
 
@@ -147,7 +147,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                   value: _agreedToTerms,
                   onChanged: (val) => setState(() => _agreedToTerms = val ?? false),
                   title: Text(
-                    'أوافق على الشروط والأحكام وسياسة الخصوصية لمنصة سَنَد',
+                    'أوافق على الشروط والأحكام وسياسة الخصوصية لمنصة Home Care',
                     style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,

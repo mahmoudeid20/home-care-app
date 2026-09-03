@@ -20,6 +20,9 @@ final localeProvider = StateProvider<Locale>((ref) => const Locale('ar'));
 /// Controls light/dark/system theme. Toggled from the Settings screen.
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
+/// Cached onboarding state for instant first-frame transition
+final hasSeenOnboardingProvider = StateProvider<bool>((ref) => false);
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -28,8 +31,16 @@ void main() async {
     FlutterError.presentError(details);
   };
 
-  final savedLang = await AppPreferences.instance.savedLocale;
-  final savedTheme = await AppPreferences.instance.savedThemeMode;
+  // Run all storage reads in parallel for instant cold-start launch
+  final results = await Future.wait([
+    AppPreferences.instance.savedLocale,
+    AppPreferences.instance.savedThemeMode,
+    OnboardingScreen.hasSeenOnboarding(),
+  ]);
+
+  final savedLang = results[0] as String?;
+  final savedTheme = results[1] as ThemeMode?;
+  final hasSeen = (results[2] as bool?) ?? false;
 
   final initialLocale = (savedLang == 'en') ? const Locale('en') : const Locale('ar');
   final initialTheme = savedTheme ?? ThemeMode.light;
@@ -39,6 +50,7 @@ void main() async {
       overrides: [
         localeProvider.overrideWith((ref) => initialLocale),
         themeModeProvider.overrideWith((ref) => initialTheme),
+        hasSeenOnboardingProvider.overrideWith((ref) => hasSeen),
       ],
       child: const SanadApp(),
     ),
@@ -53,7 +65,7 @@ class SanadApp extends ConsumerWidget {
     final locale = ref.watch(localeProvider);
 
     return MaterialApp(
-      title: 'سَنَد',
+      title: 'Home Care',
       debugShowCheckedModeBanner: false,
       locale: locale,
       supportedLocales: const [Locale('ar'), Locale('en')],
@@ -91,29 +103,12 @@ class _AuthGate extends ConsumerWidget {
   }
 }
 
-class _UnauthenticatedGate extends StatefulWidget {
+class _UnauthenticatedGate extends ConsumerWidget {
   const _UnauthenticatedGate();
 
   @override
-  State<_UnauthenticatedGate> createState() => _UnauthenticatedGateState();
-}
-
-class _UnauthenticatedGateState extends State<_UnauthenticatedGate> {
-  bool? _hasSeen;
-
-  @override
-  void initState() {
-    super.initState();
-    OnboardingScreen.hasSeenOnboarding().then((seen) {
-      if (mounted) setState(() => _hasSeen = seen);
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    if (_hasSeen == null) {
-      return const SplashScreen();
-    }
-    return _hasSeen! ? const LoginScreen() : const OnboardingScreen();
+  Widget build(BuildContext context, WidgetRef ref) {
+    final hasSeen = ref.watch(hasSeenOnboardingProvider);
+    return hasSeen ? const LoginScreen() : const OnboardingScreen();
   }
 }

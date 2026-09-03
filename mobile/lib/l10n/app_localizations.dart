@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @brandName.
   ///
   /// In ar, this message translates to:
-  /// **'سَنَد'**
+  /// **'Home Care'**
   String get brandName;
 
   /// No description provided for @brandSub.
@@ -989,7 +989,7 @@ abstract class AppLocalizations {
   /// No description provided for @onboardingSub2.
   ///
   /// In ar, this message translates to:
-  /// **'جميع ممرضي سَنَد تم التحقق من هوياتهم وشهاداتهم وتراخيص مزاولة المهنة بعناية تامة.'**
+  /// **'جميع ممرضي Home Care تم التحقق من هوياتهم وشهاداتهم وتراخيص مزاولة المهنة بعناية تامة.'**
   String get onboardingSub2;
 
   /// No description provided for @onboardingTitle3.

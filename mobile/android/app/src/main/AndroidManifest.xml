@@ -5,9 +5,10 @@
     <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
 
     <application
-        android:label="سَنَد"
+        android:label="Home Care"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:usesCleartextTraffic="true">
         <activity
             android:name=".MainActivity"

@@ -98,7 +98,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
     final fullName = profile?.fullName.isNotEmpty == true
         ? profile!.fullName
-        : (user?.username ?? user?.email.split('@').first ?? (isArabic ? 'مستخدم سَنَد' : 'Sanad User'));
+        : (user?.username ?? user?.email.split('@').first ?? (isArabic ? 'مستخدم Home Care' : 'Home Care User'));
     final userRole = user?.role == UserRole.nurse
         ? (isArabic ? 'ممرض/ة معتمد' : 'Verified Nurse')
         : (isArabic ? 'مريض / صاحب حساب' : 'Patient / Account holder');
@@ -277,8 +277,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                         content: SingleChildScrollView(
                           child: Text(
                             isArabic
-                                ? 'تطبيق سَنَد يلتزم بأعلى معايير حماية البيانات الطبية والشخصية وفقاً لقوانين جمهورية مصر العربية لعام 2026.'
-                                : 'Sanad is committed to high medical data protection and privacy standards in accordance with Egyptian regulations.',
+                                ? 'تطبيق Home Care يلتزم بأعلى معايير حماية البيانات الطبية والشخصية وفقاً لقوانين جمهورية مصر العربية لعام 2026.'
+                                : 'Home Care is committed to high medical data protection and privacy standards in accordance with Egyptian regulations.',
                             style: const TextStyle(fontSize: 13.5, height: 1.5),
                           ),
                         ),
