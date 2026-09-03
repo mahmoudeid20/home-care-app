@@ -129,13 +129,15 @@ app = create_app()
 
 @app.on_event("startup")
 async def _create_tables():
-    """Auto-create tables when using SQLite (local dev). In production with
-    PostgreSQL, Alembic migrations handle schema changes instead."""
-    from app.core.database import engine, Base, _is_sqlite
+    """Auto-create tables on startup so cloud deployment works immediately without manual migrations."""
+    from app.core.database import engine, Base
     from app import models  # noqa: F401 — ensure all models are registered
-    if _is_sqlite:
+    try:
         async with engine.begin() as conn:
             await conn.run_sync(Base.metadata.create_all)
+    except Exception as e:
+        import logging
+        logging.getLogger("uvicorn").error(f"Error creating tables on startup: {e}")
 
 
 # Serve uploaded files statically
