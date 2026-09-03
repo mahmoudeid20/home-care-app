@@ -210,14 +210,13 @@ class _NationalIdVerificationScreenState extends State<NationalIdVerificationScr
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.bg,
-        appBar: AppBar(
-          title: Text(widget.isNurse ? 'توثيق الهوية والعنوان للممرض' : 'تأكيد الهوية والعنوان'),
-          elevation: 0,
-        ),
+    return Scaffold(
+      backgroundColor: AppColors.bgOf(context),
+      appBar: AppBar(
+        title: Text(widget.isNurse ? 'توثيق الهوية والعنوان للممرض' : 'تأكيد الهوية والعنوان'),
+        elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
+      ),
         body: SafeArea(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -467,8 +466,7 @@ class _NationalIdVerificationScreenState extends State<NationalIdVerificationScr
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildIdCardBox({
@@ -485,10 +483,10 @@ class _NationalIdVerificationScreenState extends State<NationalIdVerificationScr
         height: 130,
         padding: const EdgeInsets.all(10),
         decoration: BoxDecoration(
-          color: file != null ? Colors.transparent : Colors.white,
+          color: file != null ? Colors.transparent : AppColors.surfaceOf(context),
           borderRadius: BorderRadius.circular(14),
           border: Border.all(
-            color: file != null ? AppColors.accent : AppColors.line,
+            color: file != null ? AppColors.accent : AppColors.lineOf(context),
             width: file != null ? 2 : 1,
           ),
         ),
@@ -513,8 +511,8 @@ class _NationalIdVerificationScreenState extends State<NationalIdVerificationScr
                 children: [
                   Icon(icon, color: AppColors.primary, size: 36),
                   const SizedBox(height: 8),
-                  Text(title, style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold)),
-                  Text(subtitle, style: GoogleFonts.cairo(fontSize: 10, color: AppColors.inkSoft), textAlign: TextAlign.center),
+                  Text(title, style: GoogleFonts.cairo(fontSize: 13, fontWeight: FontWeight.bold, color: AppColors.inkOf(context))),
+                  Text(subtitle, style: GoogleFonts.cairo(fontSize: 10, color: AppColors.inkSoftOf(context)), textAlign: TextAlign.center),
                 ],
               ),
       ),

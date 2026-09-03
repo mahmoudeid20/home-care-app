@@ -123,20 +123,19 @@ class _NurseDocumentsUploadScreenState extends State<NurseDocumentsUploadScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.bg,
-        appBar: AppBar(
-          title: const Text('رفع الشهادات والتراخيص'),
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return Scaffold(
+      backgroundColor: AppColors.bgOf(context),
+      appBar: AppBar(
+        title: const Text('رفع الشهادات والتراخيص / Documents'),
+        elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                 Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
@@ -170,10 +169,10 @@ class _NurseDocumentsUploadScreenState extends State<NurseDocumentsUploadScreen>
                       return Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppColors.surfaceOf(context),
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isDone ? AppColors.success : AppColors.line,
+                            color: isDone ? AppColors.success : AppColors.lineOf(context),
                             width: isDone ? 1.5 : 1,
                           ),
                         ),
@@ -194,7 +193,7 @@ class _NurseDocumentsUploadScreenState extends State<NurseDocumentsUploadScreen>
                                     style: GoogleFonts.cairo(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: AppColors.ink,
+                                      color: AppColors.inkOf(context),
                                     ),
                                   ),
                                 ),
@@ -287,7 +286,6 @@ class _NurseDocumentsUploadScreenState extends State<NurseDocumentsUploadScreen>
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 }

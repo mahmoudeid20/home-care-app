@@ -8,6 +8,7 @@ import '../../services/patient_api.dart';
 import '../../state/auth_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/error_message.dart';
+import '../../widgets/language_toggle_button.dart';
 import 'national_id_verification_screen.dart';
 import 'otp_verification_screen.dart';
 import 'terms_agreement_screen.dart';
@@ -192,10 +193,17 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     final t = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.bgOf(context),
       appBar: AppBar(
         title: Text(t.createAccountTitle),
         elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
+        actions: const [
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 12),
+            child: LanguageToggleButton(isCompact: true),
+          ),
+        ],
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -205,6 +213,37 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // Prominent Language Switcher Banner for Easy Access
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceOf(context),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: AppColors.lineOf(context)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.language_rounded, size: 20, color: AppColors.primary),
+                          const SizedBox(width: 8),
+                          Text(
+                            t.language,
+                            style: TextStyle(
+                              fontSize: 13.5,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.inkOf(context),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const LanguageToggleButton(isCompact: true),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+
                 // Top Header Card
                 Container(
                   padding: const EdgeInsets.all(18),
@@ -471,10 +510,12 @@ class _RoleCard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isSelected ? AppColors.primarySurface : Colors.white,
+          color: isSelected
+              ? (AppColors.isDark(context) ? AppColors.primary.withOpacity(0.2) : AppColors.primarySurface)
+              : AppColors.surfaceOf(context),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: isSelected ? AppColors.primary : AppColors.line,
+            color: isSelected ? AppColors.primary : AppColors.lineOf(context),
             width: isSelected ? 2 : 1,
           ),
           boxShadow: [
@@ -490,7 +531,7 @@ class _RoleCard extends StatelessWidget {
             Icon(
               icon,
               size: 32,
-              color: isSelected ? AppColors.primary : AppColors.inkSoft,
+              color: isSelected ? AppColors.primary : AppColors.inkSoftOf(context),
             ),
             const SizedBox(height: 8),
             Text(
@@ -498,7 +539,7 @@ class _RoleCard extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14,
-                color: isSelected ? AppColors.primaryDark : AppColors.ink,
+                color: isSelected ? AppColors.primary : AppColors.inkOf(context),
               ),
             ),
             const SizedBox(height: 2),
@@ -507,7 +548,7 @@ class _RoleCard extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 11,
-                color: isSelected ? AppColors.primary : AppColors.inkSoft,
+                color: isSelected ? AppColors.primary : AppColors.inkSoftOf(context),
               ),
             ),
           ],

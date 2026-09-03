@@ -49,20 +49,19 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.bg,
-        appBar: AppBar(
-          title: const Text('الشروط وسياسة الخصوصية'),
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
+    return Scaffold(
+      backgroundColor: AppColors.bgOf(context),
+      appBar: AppBar(
+        title: const Text('الشروط وسياسة الخصوصية / Terms'),
+        elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
                 // Top header
                 Row(
                   children: [
@@ -84,12 +83,12 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                             style: GoogleFonts.cairo(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: AppColors.ink,
+                              color: AppColors.inkOf(context),
                             ),
                           ),
                           Text(
                             'معايير الحماية والسرية الطبية المعتمدة في جمهورية مصر العربية',
-                            style: GoogleFonts.cairo(fontSize: 12, color: AppColors.inkSoft),
+                            style: GoogleFonts.cairo(fontSize: 12, color: AppColors.inkSoftOf(context)),
                           ),
                         ],
                       ),
@@ -103,9 +102,9 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
                   child: Container(
                     padding: const EdgeInsets.all(16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppColors.surfaceOf(context),
                       borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: AppColors.line),
+                      border: Border.all(color: AppColors.lineOf(context)),
                     ),
                     child: SingleChildScrollView(
                       child: Column(
@@ -194,8 +193,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
             ),
           ),
         ),
-      ),
-    );
+      );
   }
 
   Widget _buildSectionTitle(String title) {
@@ -216,7 +214,7 @@ class _TermsAgreementScreenState extends State<TermsAgreementScreen> {
         text,
         style: GoogleFonts.cairo(
           fontSize: 12.5,
-          color: AppColors.ink,
+          color: AppColors.inkOf(context),
           height: 1.6,
         ),
       ),

@@ -85,17 +85,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           SliverToBoxAdapter(
             child: Container(
               padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
+              decoration: BoxDecoration(
+                color: AppColors.surfaceOf(context),
+                borderRadius: const BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Color(0x08000000),
+                    color: Colors.black.withOpacity(AppColors.isDark(context) ? 0.2 : 0.04),
                     blurRadius: 10,
-                    offset: Offset(0, 4),
+                    offset: const Offset(0, 4),
                   ),
                 ],
               ),
@@ -111,10 +111,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         children: [
                           Text(
                             'أهلاً بك، $displayName 👋',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.primaryDark,
+                              color: AppColors.inkOf(context),
                             ),
                           ),
                           const SizedBox(height: 3),
@@ -124,9 +124,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                               const SizedBox(width: 4),
                               Text(
                                 userLocation,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 12.5,
-                                  color: AppColors.inkSoft,
+                                  color: AppColors.inkSoftOf(context),
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -142,7 +142,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           );
                         },
                         style: IconButton.styleFrom(
-                          backgroundColor: AppColors.primarySurface,
+                          backgroundColor: AppColors.isDark(context)
+                              ? AppColors.bgOf(context)
+                              : AppColors.primarySurface,
                         ),
                         icon: const Icon(Icons.headset_mic_rounded, color: AppColors.primary, size: 22),
                       ),
@@ -153,15 +155,16 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: AppColors.bg,
+                      color: AppColors.bgOf(context),
                       borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(color: AppColors.line),
+                      border: Border.all(color: AppColors.lineOf(context)),
                     ),
                     child: TextField(
                       controller: _searchCtrl,
+                      style: TextStyle(color: AppColors.inkOf(context)),
                       decoration: InputDecoration(
                         hintText: 'ابحث باسم الممرض، التخصص، أو الخدمة…',
-                        hintStyle: const TextStyle(fontSize: 13.5, color: AppColors.inkSoft),
+                        hintStyle: TextStyle(fontSize: 13.5, color: AppColors.inkSoftOf(context)),
                         prefixIcon: const Icon(Icons.search_rounded, color: AppColors.primary, size: 22),
                         suffixIcon: _searchCtrl.text.isNotEmpty
                             ? IconButton(
@@ -196,12 +199,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'الخدمات السريعة',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
+                      color: AppColors.inkOf(context),
                     ),
                   ),
                   const SizedBox(height: 12),
@@ -248,14 +251,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       'التخصصات التمريضية',
                       style: TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.ink,
+                        color: AppColors.inkOf(context),
                       ),
                     ),
                   ),
@@ -277,12 +280,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             selected: isSelected,
                             selectedColor: AppColors.primary,
                             checkmarkColor: Colors.white,
-                            backgroundColor: Colors.white,
+                            backgroundColor: AppColors.surfaceOf(context),
                             side: BorderSide(
-                              color: isSelected ? AppColors.primary : AppColors.line,
+                              color: isSelected ? AppColors.primary : AppColors.lineOf(context),
                             ),
                             labelStyle: TextStyle(
-                              color: isSelected ? Colors.white : AppColors.ink,
+                              color: isSelected ? Colors.white : AppColors.inkOf(context),
                               fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
                               fontSize: 12.5,
                             ),
@@ -307,7 +310,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Column(
+                  Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
@@ -315,7 +318,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         style: TextStyle(
                           fontSize: 16.5,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.ink,
+                          color: AppColors.inkOf(context),
                         ),
                       ),
                       SizedBox(height: 2),
@@ -450,12 +453,12 @@ class _QuickActionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceOf(context),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.line),
+        border: Border.all(color: AppColors.lineOf(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
+            color: Colors.black.withOpacity(AppColors.isDark(context) ? 0.2 : 0.02),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -486,16 +489,16 @@ class _QuickActionCard extends StatelessWidget {
                     children: [
                       Text(
                         title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 13.5,
-                          color: AppColors.ink,
+                          color: AppColors.inkOf(context),
                         ),
                       ),
                       const SizedBox(height: 2),
                       Text(
                         subtitle,
-                        style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
+                        style: TextStyle(fontSize: 11, color: AppColors.inkSoftOf(context)),
                       ),
                     ],
                   ),

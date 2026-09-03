@@ -2,6 +2,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import '../core/app_preferences.dart';
+import '../l10n/app_localizations.dart';
 import '../main.dart';
 import '../state/auth_controller.dart';
 import '../theme/app_theme.dart';
@@ -55,15 +57,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _confirmLogout() {
+    final isArabic = ref.read(localeProvider).languageCode == 'ar';
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('تسجيل الخروج'),
-        content: const Text('هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟'),
+        title: Text(isArabic ? 'تسجيل الخروج' : 'Log out'),
+        content: Text(
+          isArabic
+              ? 'هل أنت متأكد من رغبتك في تسجيل الخروج من التطبيق؟'
+              : 'Are you sure you want to log out?',
+        ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(),
-            child: const Text('إلغاء'),
+            child: Text(isArabic ? 'إلغاء' : 'Cancel'),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: AppColors.danger),
@@ -71,7 +78,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               Navigator.of(ctx).pop();
               ref.read(authControllerProvider.notifier).logout();
             },
-            child: const Text('خروج'),
+            child: Text(isArabic ? 'خروج' : 'Log out'),
           ),
         ],
       ),
@@ -80,21 +87,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final t = AppLocalizations.of(context);
     final auth = ref.watch(authControllerProvider);
     final user = auth.user;
     final profile = auth.patientProfile;
     final locale = ref.watch(localeProvider);
     final themeMode = ref.watch(themeModeProvider);
+    final isArabic = locale.languageCode == 'ar';
+    final isDark = themeMode == ThemeMode.dark;
 
-    final fullName = profile?.fullName ?? user?.username ?? user?.email.split('@').first ?? 'مستخدم سَنَد';
-    final userRole = user?.role == UserRole.nurse ? 'ممرض/ة معتمد' : 'مريض / صاحب حساب';
-    final location = profile?.governorate != null ? '${profile!.governorate} • ${profile.city ?? ""}' : 'جمهورية مصر العربية';
+    final fullName = profile?.fullName.isNotEmpty == true
+        ? profile!.fullName
+        : (user?.username ?? user?.email.split('@').first ?? (isArabic ? 'مستخدم سَنَد' : 'Sanad User'));
+    final userRole = user?.role == UserRole.nurse
+        ? (isArabic ? 'ممرض/ة معتمد' : 'Verified Nurse')
+        : (isArabic ? 'مريض / صاحب حساب' : 'Patient / Account holder');
+    final location = profile?.governorate != null
+        ? '${profile!.governorate} • ${profile.city ?? ""}'
+        : (isArabic ? 'جمهورية مصر العربية' : 'Egypt');
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.bgOf(context),
       appBar: AppBar(
-        title: const Text('الإعدادات'),
+        title: Text(t.settings),
         elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
@@ -104,12 +121,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             Container(
               padding: const EdgeInsets.all(18),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surfaceOf(context),
                 borderRadius: BorderRadius.circular(AppRadius.lg),
-                border: Border.all(color: AppColors.line),
+                border: Border.all(color: AppColors.lineOf(context)),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.02),
+                    color: Colors.black.withOpacity(isDark ? 0.2 : 0.03),
                     blurRadius: 10,
                     offset: const Offset(0, 3),
                   ),
@@ -121,36 +138,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     children: [
                       CircleAvatar(
                         radius: 34,
-                        backgroundColor: AppColors.primarySurface,
-                        child: Text(
-                          fullName.isNotEmpty ? fullName[0] : 'س',
-                          style: const TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
+                        backgroundColor: AppColors.primary.withOpacity(0.12),
+                        backgroundImage: profile?.photoUrl != null
+                            ? NetworkImage(profile!.photoUrl!)
+                            : null,
+                        child: profile?.photoUrl == null
+                            ? const Icon(Icons.person, size: 38, color: AppColors.primary)
+                            : null,
                       ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: InkWell(
-                          onTap: _uploadingPhoto ? null : _pickAndUploadPhoto,
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: const BoxDecoration(
-                              color: AppColors.primary,
-                              shape: BoxShape.circle,
-                            ),
-                            child: _uploadingPhoto
-                                ? const SizedBox(
-                                    width: 14,
-                                    height: 14,
-                                    child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                                  )
-                                : const Icon(Icons.camera_alt, color: Colors.white, size: 14),
-                          ),
-                        ),
+                      PositionTileCamera(
+                        isLoading: _uploadingPhoto,
+                        onTap: _pickAndUploadPhoto,
                       ),
                     ],
                   ),
@@ -161,40 +159,42 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       children: [
                         Text(
                           fullName,
-                          style: const TextStyle(
-                            fontWeight: FontWeight.w800,
-                            fontSize: 16.5,
-                            color: AppColors.ink,
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: AppColors.inkOf(context),
                           ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          user?.email ?? '',
-                          style: const TextStyle(fontSize: 12, color: AppColors.inkSoft),
+                        const SizedBox(height: 4),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            userRole,
+                            style: const TextStyle(
+                              fontSize: 11.5,
+                              color: AppColors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                         ),
                         const SizedBox(height: 6),
                         Row(
                           children: [
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                              decoration: BoxDecoration(
-                                color: AppColors.primarySurface,
-                                borderRadius: BorderRadius.circular(6),
-                              ),
-                              child: Text(
-                                userRole,
-                                style: const TextStyle(
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppColors.primaryDark,
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 8),
+                            const Icon(Icons.location_on_outlined, size: 14, color: AppColors.primary),
+                            const SizedBox(width: 4),
                             Expanded(
                               child: Text(
                                 location,
-                                style: const TextStyle(fontSize: 11, color: AppColors.inkSoft),
+                                style: TextStyle(
+                                  fontSize: 11,
+                                  color: AppColors.inkSoftOf(context),
+                                ),
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
@@ -210,35 +210,41 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // App Preferences Section
             _SettingsSection(
-              title: 'تفضيلات التطبيق',
+              title: t.appPreferences,
               items: [
                 _SettingsTile(
                   icon: Icons.language_rounded,
-                  title: 'اللغة',
-                  subtitle: locale.languageCode == 'ar' ? 'العربية' : 'English',
+                  title: t.language,
+                  subtitle: isArabic ? 'العربية' : 'English',
                   trailing: DropdownButton<String>(
                     value: locale.languageCode,
                     underline: const SizedBox.shrink(),
+                    dropdownColor: AppColors.surfaceOf(context),
                     items: const [
                       DropdownMenuItem(value: 'ar', child: Text('العربية')),
                       DropdownMenuItem(value: 'en', child: Text('English')),
                     ],
-                    onChanged: (lang) {
+                    onChanged: (lang) async {
                       if (lang != null) {
                         ref.read(localeProvider.notifier).state = Locale(lang);
+                        await AppPreferences.instance.saveLocale(lang);
                       }
                     },
                   ),
                 ),
                 _SettingsTile(
                   icon: Icons.dark_mode_outlined,
-                  title: 'الوضع الليلي',
+                  title: t.darkMode,
+                  subtitle: isDark
+                      ? (isArabic ? 'مفعل' : 'On')
+                      : (isArabic ? 'معطل' : 'Off'),
                   trailing: Switch(
-                    value: themeMode == ThemeMode.dark,
+                    value: isDark,
                     activeColor: AppColors.primary,
-                    onChanged: (enabled) {
-                      ref.read(themeModeProvider.notifier).state =
-                          enabled ? ThemeMode.dark : ThemeMode.light;
+                    onChanged: (enabled) async {
+                      final newMode = enabled ? ThemeMode.dark : ThemeMode.light;
+                      ref.read(themeModeProvider.notifier).state = newMode;
+                      await AppPreferences.instance.saveThemeMode(newMode);
                     },
                   ),
                 ),
@@ -248,12 +254,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
             // Support & About Section
             _SettingsSection(
-              title: 'الدعم والمساعدة',
+              title: t.supportAndHelp,
               items: [
                 _SettingsTile(
                   icon: Icons.support_agent_rounded,
-                  title: 'مركز المساعدة والدعم الفني',
-                  subtitle: 'الأسئلة الشائعة وخدمة العملاء',
+                  title: t.contactSupport,
+                  subtitle: isArabic ? 'الأسئلة الشائعة وخدمة العملاء' : 'FAQ & Customer Service',
                   onTap: () {
                     Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const SupportScreen()),
@@ -262,32 +268,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 _SettingsTile(
                   icon: Icons.shield_outlined,
-                  title: 'الشروط والأحكام وسياسة الخصوصية',
+                  title: t.termsAndPrivacy,
                   onTap: () {
                     showDialog(
                       context: context,
                       builder: (ctx) => AlertDialog(
-                        title: const Text('الشروط وسياسة الخصوصية'),
-                        content: const SingleChildScrollView(
+                        title: Text(t.termsAndPrivacy),
+                        content: SingleChildScrollView(
                           child: Text(
-                            'تطبيق سَنَد يلتزم بحماية البيانات الطبية والشخصية لكافة المستخدمين وفقاً لمعايير الخصوصية والأمان الطبي المعمول بها في جمهورية مصر العربية.\n\nتقتصر الخدمات على ربط المرضى بالممرضين المعتمدين والموثقين.',
-                            style: TextStyle(fontSize: 13.5, height: 1.5),
+                            isArabic
+                                ? 'تطبيق سَنَد يلتزم بأعلى معايير حماية البيانات الطبية والشخصية وفقاً لقوانين جمهورية مصر العربية لعام 2026.'
+                                : 'Sanad is committed to high medical data protection and privacy standards in accordance with Egyptian regulations.',
+                            style: const TextStyle(fontSize: 13.5, height: 1.5),
                           ),
                         ),
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.of(ctx).pop(),
-                            child: const Text('إغلاق'),
+                            child: Text(isArabic ? 'إغلاق' : 'Close'),
                           ),
                         ],
                       ),
                     );
                   },
-                ),
-                _SettingsTile(
-                  icon: Icons.info_outline_rounded,
-                  title: 'عن تطبيق سَنَد',
-                  subtitle: 'الإصدار 1.0.0 (حصري لمصر)',
                 ),
               ],
             ),
@@ -300,12 +303,46 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 foregroundColor: AppColors.danger,
                 side: const BorderSide(color: AppColors.danger, width: 1.2),
                 minimumSize: const Size.fromHeight(50),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(AppRadius.md)),
               ),
               icon: const Icon(Icons.logout_rounded, size: 20),
-              label: const Text('تسجيل الخروج', style: TextStyle(fontWeight: FontWeight.bold)),
+              label: Text(t.logout, style: const TextStyle(fontWeight: FontWeight.bold)),
             ),
             const SizedBox(height: 32),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class PositionTileCamera extends StatelessWidget {
+  final bool isLoading;
+  final VoidCallback onTap;
+
+  const PositionTileCamera({super.key, required this.isLoading, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned(
+      bottom: 0,
+      right: 0,
+      child: InkWell(
+        onTap: isLoading ? null : onTap,
+        child: Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+          ),
+          child: isLoading
+              ? const SizedBox(
+                  width: 14,
+                  height: 14,
+                  child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                )
+              : const Icon(Icons.camera_alt, color: Colors.white, size: 14),
         ),
       ),
     );
@@ -327,23 +364,23 @@ class _SettingsSection extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
           child: Text(
             title,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w800,
-              color: AppColors.inkSoft,
+              color: AppColors.inkSoftOf(context),
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppColors.surfaceOf(context),
             borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(color: AppColors.line),
+            border: Border.all(color: AppColors.lineOf(context)),
           ),
           child: Column(
             children: [
               for (int i = 0; i < items.length; i++) ...[
-                if (i > 0) const Divider(height: 1, color: AppColors.line),
+                if (i > 0) Divider(height: 1, color: AppColors.lineOf(context)),
                 items[i],
               ],
             ],
@@ -362,6 +399,7 @@ class _SettingsTile extends StatelessWidget {
   final VoidCallback? onTap;
 
   const _SettingsTile({
+    super.key,
     required this.icon,
     required this.title,
     this.subtitle,
@@ -375,19 +413,26 @@ class _SettingsTile extends StatelessWidget {
       leading: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: AppColors.primarySurface,
+          color: AppColors.primary.withOpacity(0.1),
           borderRadius: BorderRadius.circular(8),
         ),
         child: Icon(icon, color: AppColors.primary, size: 20),
       ),
       title: Text(
         title,
-        style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w700, color: AppColors.ink),
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w700,
+          color: AppColors.inkOf(context),
+        ),
       ),
       subtitle: subtitle != null
-          ? Text(subtitle!, style: const TextStyle(fontSize: 12, color: AppColors.inkSoft))
+          ? Text(
+              subtitle!,
+              style: TextStyle(fontSize: 12, color: AppColors.inkSoftOf(context)),
+            )
           : null,
-      trailing: trailing ?? (onTap != null ? const Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.inkSoft) : null),
+      trailing: trailing ?? (onTap != null ? Icon(Icons.arrow_forward_ios_rounded, size: 14, color: AppColors.inkSoftOf(context)) : null),
       onTap: onTap,
     );
   }

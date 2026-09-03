@@ -152,227 +152,225 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        backgroundColor: AppColors.bg,
-        appBar: AppBar(
-          title: const Text('تأكيد الحساب'),
-          elevation: 0,
-        ),
-        body: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
+    return Scaffold(
+      backgroundColor: AppColors.bgOf(context),
+      appBar: AppBar(
+        title: const Text('تأكيد الحساب / Verify Account'),
+        elevation: 0,
+        backgroundColor: AppColors.surfaceOf(context),
+      ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              const SizedBox(height: 16),
+              Container(
+                width: 90,
+                height: 90,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withOpacity(0.08),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.mark_email_read_outlined,
+                  color: AppColors.primary,
+                  size: 46,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'رمز التحقق السريع (OTP)',
+                style: GoogleFonts.cairo(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.inkOf(context),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                widget.channel == 'EMAIL'
+                    ? 'تم إرسال رمز تأكيد مكون من 6 أرقام إلى بريدك الإلكتروني:'
+                    : 'تم إرسال رمز تأكيد مكون من 6 أرقام إلى هاتفك:',
+                textAlign: TextAlign.center,
+                style: GoogleFonts.cairo(
+                  fontSize: 14,
+                  color: AppColors.inkSoftOf(context),
+                ),
+              ),
+              const SizedBox(height: 6),
+              Text(
+                widget.recipient,
+                style: GoogleFonts.cairo(
+                  fontSize: 15,
+                  fontWeight: FontWeight.bold,
+                  color: AppColors.primary,
+                ),
+              ),
+              const SizedBox(height: 32),
+
+              // 6 Pin Boxes
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: List.generate(6, (index) {
+                  return SizedBox(
+                    width: 48,
+                    height: 56,
+                    child: TextField(
+                      controller: _controllers[index],
+                      focusNode: _focusNodes[index],
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      maxLength: 1,
+                      style: GoogleFonts.cairo(
+                        fontSize: 22,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.inkOf(context),
+                      ),
+                      decoration: InputDecoration(
+                        counterText: '',
+                        filled: true,
+                        fillColor: AppColors.surfaceOf(context),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide(color: AppColors.lineOf(context)),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: const BorderSide(color: AppColors.primary, width: 2),
+                        ),
+                      ),
+                      onChanged: (val) {
+                        if (val.isNotEmpty && index < 5) {
+                          _focusNodes[index + 1].requestFocus();
+                        } else if (val.isEmpty && index > 0) {
+                          _focusNodes[index - 1].requestFocus();
+                        }
+                        if (_currentCode.length == 6) {
+                          _verifyCode();
+                        }
+                      },
+                    ),
+                  );
+                }),
+              ),
+
+              if (_debugCode != null) ...[
+                const SizedBox(height: 18),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.accent),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.info_outline, color: AppColors.accent, size: 18),
+                      const SizedBox(width: 8),
+                      Text(
+                        'رمز التجربة السريع: $_debugCode',
+                        style: GoogleFonts.cairo(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.accent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+
+              if (_errorMessage != null) ...[
                 const SizedBox(height: 16),
                 Container(
-                  width: 90,
-                  height: 90,
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.08),
-                    shape: BoxShape.circle,
+                    color: AppColors.danger.withOpacity(0.08),
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: AppColors.danger.withOpacity(0.3)),
                   ),
-                  child: const Icon(
-                    Icons.mark_email_read_outlined,
-                    color: AppColors.primary,
-                    size: 46,
-                  ),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  'رمز التحقق السريع (OTP)',
-                  style: GoogleFonts.cairo(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.ink,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  widget.channel == 'EMAIL'
-                      ? 'تم إرسال رمز تأكيد مكون من 6 أرقام إلى بريدك الإلكتروني:'
-                      : 'تم إرسال رمز تأكيد مكون من 6 أرقام إلى هاتفك:',
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.cairo(
-                    fontSize: 14,
-                    color: AppColors.inkSoft,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.recipient,
-                  style: GoogleFonts.cairo(
-                    fontSize: 15,
-                    fontWeight: FontWeight.bold,
-                    color: AppColors.primary,
-                  ),
-                ),
-                const SizedBox(height: 32),
-
-                // 6 Pin Boxes
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: List.generate(6, (index) {
-                    return SizedBox(
-                      width: 48,
-                      height: 56,
-                      child: TextField(
-                        controller: _controllers[index],
-                        focusNode: _focusNodes[index],
-                        keyboardType: TextInputType.number,
-                        textAlign: TextAlign.center,
-                        maxLength: 1,
-                        style: GoogleFonts.cairo(
-                          fontSize: 22,
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.ink,
-                        ),
-                        decoration: InputDecoration(
-                          counterText: '',
-                          filled: true,
-                          fillColor: Colors.white,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.line),
-                          ),
-                          focusedBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: const BorderSide(color: AppColors.primary, width: 2),
-                          ),
-                        ),
-                        onChanged: (val) {
-                          if (val.isNotEmpty && index < 5) {
-                            _focusNodes[index + 1].requestFocus();
-                          } else if (val.isEmpty && index > 0) {
-                            _focusNodes[index - 1].requestFocus();
-                          }
-                          if (_currentCode.length == 6) {
-                            _verifyCode();
-                          }
-                        },
-                      ),
-                    );
-                  }),
-                ),
-
-                if (_debugCode != null) ...[
-                  const SizedBox(height: 18),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: AppColors.accent.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.accent),
+                  child: Text(
+                    _errorMessage!,
+                    style: GoogleFonts.cairo(
+                      fontSize: 13,
+                      color: AppColors.danger,
+                      fontWeight: FontWeight.w600,
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.info_outline, color: AppColors.accent, size: 18),
-                        const SizedBox(width: 8),
-                        Text(
-                          'رمز التجربة السريع: $_debugCode',
+                  ),
+                ),
+              ],
+
+              const SizedBox(height: 36),
+
+              // Submit button
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  onPressed: _isLoading ? null : _verifyCode,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                  child: _isLoading
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                        )
+                      : Text(
+                          'تأكيد ومتابعة',
                           style: GoogleFonts.cairo(
-                            fontSize: 13,
+                            fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: AppColors.accent,
+                            color: Colors.white,
                           ),
                         ),
-                      ],
-                    ),
-                  ),
-                ],
-
-                if (_errorMessage != null) ...[
-                  const SizedBox(height: 16),
-                  Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: AppColors.danger.withOpacity(0.08),
-                      borderRadius: BorderRadius.circular(10),
-                      border: Border.all(color: AppColors.danger.withOpacity(0.3)),
-                    ),
-                    child: Text(
-                      _errorMessage!,
-                      style: GoogleFonts.cairo(
-                        fontSize: 13,
-                        color: AppColors.danger,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                ],
-
-                const SizedBox(height: 36),
-
-                // Submit button
-                SizedBox(
-                  width: double.infinity,
-                  height: 52,
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _verifyCode,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const SizedBox(
-                            width: 24,
-                            height: 24,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                          )
-                        : Text(
-                            'تأكيد ومتابعة',
-                            style: GoogleFonts.cairo(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
-                  ),
                 ),
+              ),
 
-                const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-                // Resend Timer
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
+              // Resend Timer
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'لم يصلك الرمز؟ ',
+                    style: GoogleFonts.cairo(
+                      fontSize: 14,
+                      color: AppColors.inkSoftOf(context),
+                    ),
+                  ),
+                  if (_resendCountdown > 0)
                     Text(
-                      'لم يصلك الرمز؟ ',
+                      'إعادة الإرسال بعد $_resendCountdown ثانية',
                       style: GoogleFonts.cairo(
                         fontSize: 14,
-                        color: AppColors.inkSoft,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.primary,
                       ),
-                    ),
-                    if (_resendCountdown > 0)
-                      Text(
-                        'إعادة الإرسال بعد $_resendCountdown ثانية',
+                    )
+                  else
+                    TextButton(
+                      onPressed: _isLoading ? null : _resendCode,
+                      child: Text(
+                        'إعادة إرسال الرمز الآن',
                         style: GoogleFonts.cairo(
                           fontSize: 14,
                           fontWeight: FontWeight.bold,
                           color: AppColors.primary,
                         ),
-                      )
-                    else
-                      TextButton(
-                        onPressed: _isLoading ? null : _resendCode,
-                        child: Text(
-                          'إعادة إرسال الرمز الآن',
-                          style: GoogleFonts.cairo(
-                            fontSize: 14,
-                            fontWeight: FontWeight.bold,
-                            color: AppColors.primary,
-                          ),
-                        ),
                       ),
-                  ],
-                ),
-              ],
-            ),
+                    ),
+                ],
+              ),
+            ],
           ),
         ),
       ),

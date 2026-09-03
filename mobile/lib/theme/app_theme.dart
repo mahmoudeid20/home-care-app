@@ -43,6 +43,27 @@ class AppColors {
   static const dangerLight = Color(0xFFFEE2E2);
   static const warning = Color(0xFFF59E0B);
   static const warningLight = Color(0xFFFEF3C7);
+
+  // Dynamic Context-aware Colors (Light & Dark Mode)
+  static bool isDark(BuildContext context) => Theme.of(context).brightness == Brightness.dark;
+
+  static Color bgOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF0B1120) : const Color(0xFFF8FAFC);
+
+  static Color surfaceOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF1E293B) : const Color(0xFFFFFFFF);
+
+  static Color cardOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF1A2234) : const Color(0xFFFFFFFF);
+
+  static Color inkOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFFF8FAFC) : const Color(0xFF0F172A);
+
+  static Color inkSoftOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF94A3B8) : const Color(0xFF64748B);
+
+  static Color lineOf(BuildContext context) =>
+      isDark(context) ? const Color(0xFF334155) : const Color(0xFFE2E8F0);
 }
 
 class AppRadius {

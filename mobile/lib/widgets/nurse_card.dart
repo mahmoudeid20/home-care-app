@@ -66,12 +66,12 @@ class NurseCard extends StatelessWidget {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppColors.surfaceOf(context),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.line),
+        border: Border.all(color: AppColors.lineOf(context)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withOpacity(AppColors.isDark(context) ? 0.2 : 0.03),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -98,8 +98,8 @@ class NurseCard extends StatelessWidget {
                         right: 0,
                         child: Container(
                           padding: const EdgeInsets.all(2),
-                          decoration: const BoxDecoration(
-                            color: Colors.white,
+                          decoration: BoxDecoration(
+                            color: AppColors.surfaceOf(context),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
@@ -123,10 +123,10 @@ class NurseCard extends StatelessWidget {
                           Expanded(
                             child: Text(
                               nurse.fullName,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontWeight: FontWeight.w800,
                                 fontSize: 15.5,
-                                color: AppColors.ink,
+                                color: AppColors.inkOf(context),
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -135,7 +135,7 @@ class NurseCard extends StatelessWidget {
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2.5),
                               decoration: BoxDecoration(
-                                color: AppColors.primarySurface,
+                                color: AppColors.primary.withOpacity(0.12),
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
@@ -143,7 +143,7 @@ class NurseCard extends StatelessWidget {
                                 style: const TextStyle(
                                   fontSize: 10.5,
                                   fontWeight: FontWeight.w700,
-                                  color: AppColors.primaryDark,
+                                  color: AppColors.primary,
                                 ),
                               ),
                             ),

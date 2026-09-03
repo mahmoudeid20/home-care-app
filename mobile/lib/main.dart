@@ -11,14 +11,16 @@ import 'screens/onboarding_screen.dart';
 import 'screens/profile_setup_wizard.dart';
 import 'state/auth_controller.dart';
 
-/// Holds the current locale; toggled from the Settings screen's
-/// language switch. Defaults to Arabic — the app's primary market.
+import 'core/app_preferences.dart';
+
+/// Holds the current locale; toggled from the Settings or Registration screens.
+/// Defaults to Arabic — the app's primary market.
 final localeProvider = StateProvider<Locale>((ref) => const Locale('ar'));
 
 /// Controls light/dark/system theme. Toggled from the Settings screen.
 final themeModeProvider = StateProvider<ThemeMode>((ref) => ThemeMode.light);
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   // Global error handler — catch uncaught Flutter framework errors
@@ -26,7 +28,21 @@ void main() {
     FlutterError.presentError(details);
   };
 
-  runApp(const ProviderScope(child: SanadApp()));
+  final savedLang = await AppPreferences.instance.savedLocale;
+  final savedTheme = await AppPreferences.instance.savedThemeMode;
+
+  final initialLocale = (savedLang == 'en') ? const Locale('en') : const Locale('ar');
+  final initialTheme = savedTheme ?? ThemeMode.light;
+
+  runApp(
+    ProviderScope(
+      overrides: [
+        localeProvider.overrideWith((ref) => initialLocale),
+        themeModeProvider.overrideWith((ref) => initialTheme),
+      ],
+      child: const SanadApp(),
+    ),
+  );
 }
 
 class SanadApp extends ConsumerWidget {

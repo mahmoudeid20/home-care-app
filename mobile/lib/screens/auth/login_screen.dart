@@ -4,6 +4,7 @@ import '../../core/api_exception.dart';
 import '../../l10n/app_localizations.dart';
 import '../../state/auth_controller.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/language_toggle_button.dart';
 import 'register_screen.dart';
 import '../../widgets/error_message.dart';
 
@@ -62,7 +63,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     final t = AppLocalizations.of(context)!;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.bgOf(context),
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -73,6 +74,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Top Language Switcher
+                  const Align(
+                    alignment: Alignment.topRight,
+                    child: LanguageToggleButton(isCompact: true),
+                  ),
+                  const SizedBox(height: 16),
+
                   // App Brand Logo
                   Center(
                     child: Container(
