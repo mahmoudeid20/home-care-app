@@ -107,7 +107,7 @@ class AuthController extends StateNotifier<AuthState> {
     }
   }
 
-  void completeProfileSetup(PatientProfile profile) {
+  void completeProfileSetup([PatientProfile? profile]) {
     if (state.user != null) {
       state = AuthState.authenticated(state.user!, profile);
     }

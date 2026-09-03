@@ -30,10 +30,12 @@ class PatientRepository:
         preferred_language: str,
         location_id: uuid.UUID | None,
         photo_url: str | None = None,
+        national_id: str | None = None,
     ) -> Patient:
         patient = Patient(
             user_id=user_id,
             full_name=full_name,
+            national_id=national_id,
             preferred_language=preferred_language,
             photo_url=photo_url,
             location_id=location_id,

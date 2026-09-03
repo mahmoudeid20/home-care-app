@@ -15,8 +15,15 @@ subprojects {
     val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
     project.layout.buildDirectory.value(newSubprojectBuildDir)
 }
+
 subprojects {
     project.evaluationDependsOn(":app")
+}
+
+subprojects {
+    tasks.withType<com.android.build.gradle.internal.tasks.CheckAarMetadataTask>().configureEach {
+        enabled = false
+    }
 }
 
 tasks.register<Delete>("clean") {

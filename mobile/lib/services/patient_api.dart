@@ -48,19 +48,23 @@ class PatientApi {
 
   Future<PatientProfile> createProfile({
     required String fullName,
+    String? nationalId,
     String? governorate,
     String? city,
+    String? addressLine,
     String? photoUrl,
   }) async {
     try {
       final res = await _dio.post('/patients/me', data: {
         'full_name': fullName,
+        if (nationalId != null && nationalId.isNotEmpty) 'national_id': nationalId,
         'preferred_language': 'ar',
         if (photoUrl != null && photoUrl.isNotEmpty) 'photo_url': photoUrl,
         if (governorate != null && city != null)
           'location': {
             'governorate': governorate,
             'city': city,
+            if (addressLine != null && addressLine.isNotEmpty) 'address_line': addressLine,
           },
       });
       return PatientProfile.fromJson(res.data as Map<String, dynamic>);

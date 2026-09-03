@@ -3,6 +3,7 @@ from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user, get_redis_dep
+from app.core.config import settings
 from app.core.database import get_db
 from app.models.user import User
 from app.schemas.auth import (
@@ -15,6 +16,10 @@ from app.schemas.auth import (
     ResetPasswordRequest,
     TokenResponse,
     UserResponse,
+    SendOTPRequest,
+    VerifyOTPRequest,
+    ValidateNationalIDRequest,
+    NationalIDResponse,
 )
 from app.services.auth_service import AuthService
 
@@ -133,3 +138,78 @@ async def reset_password(
 )
 async def get_me(user: User = Depends(get_current_user)) -> UserResponse:
     return UserResponse.model_validate(user)
+
+
+@router.post(
+    "/send-otp",
+    summary="Generate and send a 6-digit OTP code via Email or SMS",
+    status_code=status.HTTP_200_OK,
+)
+async def send_otp(
+    payload: SendOTPRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    from app.services.otp_service import OTPService
+    from app.models.otp import OTPChannel, OTPPurpose
+
+    channel = OTPChannel.SMS if payload.channel.upper() == "SMS" else OTPChannel.EMAIL
+    purpose = OTPPurpose(payload.purpose.upper()) if payload.purpose.upper() in OTPPurpose.__members__ else OTPPurpose.REGISTRATION
+
+    service = OTPService(db)
+    code = await service.generate_otp(recipient=payload.recipient, channel=channel, purpose=purpose)
+    return {
+        "message": "تم إرسال رمز التحقق بنجاح",
+        "channel": channel.value,
+        "expires_in_minutes": 10,
+        "debug_code": code if settings.ENV == "development" else None,
+    }
+
+
+@router.post(
+    "/verify-otp",
+    summary="Verify a 6-digit OTP code",
+    status_code=status.HTTP_200_OK,
+)
+async def verify_otp(
+    payload: VerifyOTPRequest,
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    from app.services.otp_service import OTPService
+    from app.models.otp import OTPPurpose
+
+    purpose = OTPPurpose(payload.purpose.upper()) if payload.purpose.upper() in OTPPurpose.__members__ else OTPPurpose.REGISTRATION
+    service = OTPService(db)
+    verified = await service.verify_otp(recipient=payload.recipient, code=payload.code, purpose=purpose)
+    return {
+        "verified": verified,
+        "message": "تم التحقق بنجاح",
+    }
+
+
+@router.post(
+    "/validate-national-id",
+    response_model=NationalIDResponse,
+    summary="Validate and extract birthdate, governorate, and gender from Egyptian National ID",
+)
+async def validate_national_id(payload: ValidateNationalIDRequest) -> NationalIDResponse:
+    from app.utils.egyptian_id import parse_egyptian_national_id
+    info = parse_egyptian_national_id(payload.national_id)
+    return NationalIDResponse(**info.to_dict())
+
+
+@router.post(
+    "/accept-terms",
+    summary="Record user acceptance of terms of service and privacy policy",
+    status_code=status.HTTP_200_OK,
+)
+async def accept_terms(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+) -> dict:
+    from datetime import datetime, timezone
+    # Update user acceptance timestamp if field exists
+    if hasattr(user, "terms_accepted_at"):
+        user.terms_accepted_at = datetime.now(timezone.utc)
+        await db.commit()
+    return {"accepted": True, "message": "تمت الموافقة على الشروط والخصوصية بنجاح"}
+

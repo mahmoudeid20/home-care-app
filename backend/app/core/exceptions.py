@@ -16,6 +16,11 @@ class AppError(Exception):
         super().__init__(message)
 
 
+class BadRequestError(AppError):
+    status_code = 400
+    error_code = "BAD_REQUEST"
+
+
 class NotFoundError(AppError):
     status_code = 404
     error_code = "NOT_FOUND"

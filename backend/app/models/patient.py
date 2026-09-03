@@ -23,8 +23,7 @@ class Patient(Base, UUIDPrimaryKeyMixin, TimestampMixin):
         UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
     )
     full_name: Mapped[str] = mapped_column(String(150), nullable=False)
-    # URL of an already-uploaded image in secure object storage — same
-    # pattern/validation as Nurse.photo_url (see app/utils/file_validation.py).
+    national_id: Mapped[str | None] = mapped_column(String(14), unique=True, index=True, nullable=True)
     photo_url: Mapped[str | None] = mapped_column(String(1024), nullable=True)
 
     location_id: Mapped[uuid.UUID | None] = mapped_column(

@@ -28,6 +28,7 @@ class PatientService:
         patient = await self.patients.create(
             user_id=user_id,
             full_name=data.full_name,
+            national_id=data.national_id,
             preferred_language=data.preferred_language,
             photo_url=data.photo_url,
             location_id=location_id,
@@ -46,6 +47,8 @@ class PatientService:
 
         if data.full_name is not None:
             patient.full_name = data.full_name
+        if data.national_id is not None:
+            patient.national_id = data.national_id
         if data.preferred_language is not None:
             patient.preferred_language = data.preferred_language
         if data.photo_url is not None:

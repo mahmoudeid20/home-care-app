@@ -38,6 +38,7 @@ from app.models.admin_action import AdminAction  # noqa: F401
 from app.models.platform_settings import PlatformSettings  # noqa: F401
 from app.models.payment import Payment, PaymentStatus  # noqa: F401
 from app.models.complaint import Complaint, ComplaintStatus  # noqa: F401
+from app.models.otp import OTPCode, OTPChannel, OTPPurpose  # noqa: F401
 
 __all__ = [
     "User",

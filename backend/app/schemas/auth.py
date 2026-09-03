@@ -92,3 +92,29 @@ class UserResponse(BaseModel):
 class AuthResponse(BaseModel):
     user: UserResponse
     tokens: TokenResponse
+
+
+class SendOTPRequest(BaseModel):
+    recipient: str
+    channel: str = "EMAIL"  # EMAIL or SMS
+    purpose: str = "REGISTRATION"
+
+
+class VerifyOTPRequest(BaseModel):
+    recipient: str
+    code: str = Field(min_length=6, max_length=6)
+    purpose: str = "REGISTRATION"
+
+
+class ValidateNationalIDRequest(BaseModel):
+    national_id: str
+
+
+class NationalIDResponse(BaseModel):
+    national_id: str
+    is_valid: bool
+    birth_date: str | None = None
+    governorate: str | None = None
+    gender: str | None = None
+    error_message: str | None = None
+

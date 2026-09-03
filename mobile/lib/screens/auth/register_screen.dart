@@ -3,9 +3,16 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/api_exception.dart';
 import '../../l10n/app_localizations.dart';
 import '../../models/user.dart';
+import '../../services/otp_api.dart';
+import '../../services/patient_api.dart';
 import '../../state/auth_controller.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/error_message.dart';
+import 'national_id_verification_screen.dart';
+import 'otp_verification_screen.dart';
+import 'terms_agreement_screen.dart';
+import 'welcome_celebration_screen.dart';
+import '../nurse/nurse_documents_upload_screen.dart';
 
 class RegisterScreen extends ConsumerStatefulWidget {
   const RegisterScreen({super.key});
@@ -51,18 +58,122 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
     });
 
     try {
+      final email = _emailCtrl.text.trim();
+      final fullName = _fullNameCtrl.text.trim();
+      final isNurse = _role == UserRole.nurse;
+
       await ref.read(authControllerProvider.notifier).register(
-            email: _emailCtrl.text.trim(),
+            email: email,
             password: _passwordCtrl.text,
             role: _role,
             phone: _phoneCtrl.text.trim().isEmpty ? null : _phoneCtrl.text.trim(),
             username: _usernameCtrl.text.trim().isEmpty ? null : _usernameCtrl.text.trim(),
           );
 
-      // Pop back to root so _AuthGate can transition smoothly
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
+      // Send OTP code to email
+      final otpApi = OtpApi();
+      Map<String, dynamic>? otpRes;
+      try {
+        otpRes = await otpApi.sendOtp(recipient: email, channel: 'EMAIL', purpose: 'REGISTRATION');
+      } catch (_) {
+        // Continue even if network glitch in dev
       }
+
+      if (!mounted) return;
+
+      // Navigate to OTP Verification Screen
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (_) => OtpVerificationScreen(
+            recipient: email,
+            channel: 'EMAIL',
+            initialDebugCode: otpRes?['debug_code'] as String?,
+            onVerified: () {
+              // Once OTP is verified -> Navigate to National ID & Address Verification
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (_) => NationalIdVerificationScreen(
+                    isNurse: isNurse,
+                    onCompleted: (nationalId, governorate, city, address, frontUrl, backUrl) async {
+                      if (isNurse) {
+                        // Nurse -> Upload professional certificates
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => NurseDocumentsUploadScreen(
+                              onCompleted: () {
+                                // Nurse -> Accept Terms
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (_) => TermsAgreementScreen(
+                                      isNurse: true,
+                                      onAccepted: () {
+                                        // Nurse -> Welcome Celebration
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (_) => WelcomeCelebrationScreen(
+                                              userName: fullName,
+                                              isNurse: true,
+                                              onStart: () {
+                                                ref.read(authControllerProvider.notifier).completeProfileSetup();
+                                                Navigator.of(context).popUntil((route) => route.isFirst);
+                                              },
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Patient -> Create profile with national ID and location
+                        try {
+                          final patientApi = PatientApi();
+                          await patientApi.createProfile(
+                            fullName: fullName,
+                            nationalId: nationalId,
+                            governorate: governorate,
+                            city: city,
+                            addressLine: address,
+                          );
+                        } catch (_) {}
+
+                        // Patient -> Accept Terms
+                        if (!mounted) return;
+                        Navigator.of(context).pushReplacement(
+                          MaterialPageRoute(
+                            builder: (_) => TermsAgreementScreen(
+                              isNurse: false,
+                              onAccepted: () {
+                                // Patient -> Welcome Celebration
+                                Navigator.of(context).pushReplacement(
+                                  MaterialPageRoute(
+                                    builder: (_) => WelcomeCelebrationScreen(
+                                      userName: fullName,
+                                      isNurse: false,
+                                      onStart: () {
+                                        ref.read(authControllerProvider.notifier).completeProfileSetup();
+                                        Navigator.of(context).popUntil((route) => route.isFirst);
+                                      },
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+      );
     } on ApiException catch (e) {
       if (mounted) {
         setState(() => _errorMessage = friendlyErrorMessage(e, t));

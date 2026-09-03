@@ -1,0 +1,27 @@
+services:
+  - type: web
+    name: sanad-api
+    runtime: python
+    buildCommand: "cd backend && pip install -r requirements.txt"
+    startCommand: "cd backend && uvicorn app.main:app --host 0.0.0.0 --port $PORT"
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.0
+      - key: ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_REFRESH_SECRET
+        generateValue: true
+      - key: DATABASE_URL
+        fromDatabase:
+          name: sanad-db
+          property: connectionString
+
+databases:
+  - name: sanad-db
+    plan: free
+    databaseName: sanad
+    user: sanad_user
