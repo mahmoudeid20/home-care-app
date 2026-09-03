@@ -1,0 +1,61 @@
+# ==========================================
+# Root .gitignore for HomeCare (Sanad)
+# ==========================================
+
+# APK & Binaries
+*.apk
+*.aab
+sanad-app.apk
+
+# Python / Backend
+backend/.venv/
+.venv/
+venv/
+ENV/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Local databases & uploads
+*.db
+*.sqlite
+*.sqlite3
+backend/homecare.db
+backend/uploads/*
+!backend/uploads/.gitkeep
+
+# Environment secrets (keep example)
+backend/.env
+.env
+!.env.example
+
+# Flutter & Dart
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+mobile/.pub-cache/
+mobile/.pub/
+
+# Android build outputs
+mobile/android/.gradle/
+mobile/android/app/build/
+mobile/android/local.properties
+**/android/**/build/
+**/android/**/.gradle/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS files
+.DS_Store
+Thumbs.db

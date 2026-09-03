@@ -1,0 +1,69 @@
+name: sanad
+description: "Sanad — Home Care Marketplace (patients & nurses)"
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  # Floor set to a realistically current Flutter (anyone installing fresh
+  # today will get something much newer) rather than the historical 3.3 —
+  # this app uses APIs like CardThemeData and DropdownButtonFormField's
+  # modern parameter set that aren't guaranteed on very old Flutter, and
+  # defending against a version nobody would actually be running is not
+  # worth the ambiguity. Bump this further if `flutter --version` reports
+  # something newer and you hit any deprecation warnings.
+  sdk: '>=3.3.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: ^0.20.2
+  cupertino_icons: ^1.0.6
+  image_picker: ^1.1.2
+  google_fonts: ^6.2.1
+  dio: ^5.4.3+1
+  flutter_riverpod: ^2.5.1
+  flutter_secure_storage: ^9.2.2
+  cached_network_image: ^3.3.1
+  web_socket_channel: ^2.4.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+  flutter_launcher_icons: ^0.13.1
+  flutter_native_splash: ^2.4.1
+
+flutter:
+  uses-material-design: true
+  generate: true   # enables flutter_localizations codegen from lib/l10n/*.arb
+  assets:
+    - assets/icons/
+
+# Real app icon, generated from the Sanad mark (assets/icons/app_icon.png,
+# rendered from ../../docs/design/sanad-logo.svg via rsvg-convert). Run
+# once after `flutter pub get`:
+#   dart run flutter_launcher_icons
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icons/app_icon.png"
+  adaptive_icon_background: "#073B35"
+  adaptive_icon_foreground: "assets/icons/app_icon_foreground.png"
+  remove_alpha_ios: true
+
+# Native splash screen (shown before Flutter's own engine/first frame is
+# ready — different from lib/screens/splash_screen.dart, which is the
+# in-Flutter screen shown *after* that, while auth bootstrap runs). Run:
+#   dart run flutter_native_splash:create
+flutter_native_splash:
+  color: "#FAFAF8"
+  image: "assets/icons/app_icon_foreground.png"
+  color_dark: "#073B35"
+  image_dark: "assets/icons/app_icon_foreground.png"
+  android_12:
+    image: "assets/icons/app_icon_foreground.png"
+    icon_background_color: "#FAFAF8"
+    image_dark: "assets/icons/app_icon_foreground.png"
+    icon_background_color_dark: "#073B35"

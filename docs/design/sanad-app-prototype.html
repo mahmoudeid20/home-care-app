@@ -1,0 +1,564 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sanad — سند | Home Care App Prototype</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&family=Tajawal:wght@400;500;700&family=Manrope:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --teal-900:#073B35;
+    --teal-700:#0E5C53;
+    --teal-500:#157A6E;
+    --teal-100:#DEEFEC;
+    --amber:#F5A623;
+    --amber-dark:#D98B0E;
+    --bg:#FAFAF8;
+    --surface:#FFFFFF;
+    --ink:#161F1D;
+    --ink-soft:#5B6B67;
+    --line:#E7EEEC;
+    --danger:#E5484D;
+    --success:#2F9E63;
+    --radius-lg:22px;
+    --radius-md:14px;
+    --radius-sm:10px;
+    --shadow: 0 10px 30px -12px rgba(7,59,53,0.22);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background: radial-gradient(1200px 600px at 20% -10%, #E7F3F1 0%, var(--bg) 55%);
+    font-family:'Inter','Manrope',sans-serif;
+    color:var(--ink);
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:32px 16px 64px;
+  }
+  [dir="rtl"] body{ font-family:'Cairo','Tajawal',sans-serif; }
+
+  .top{
+    width:100%; max-width:1040px; display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:26px; flex-wrap:wrap; gap:14px;
+  }
+  .brand-row{ display:flex; align-items:center; gap:12px; }
+  .brand-row svg{ width:40px; height:40px; }
+  .brand-name{ font-family:'Manrope',sans-serif; font-weight:800; font-size:20px; color:var(--teal-900); letter-spacing:-.2px;}
+  [dir="rtl"] .brand-name{ font-family:'Cairo',sans-serif; }
+  .brand-sub{ font-size:12px; color:var(--ink-soft); margin-top:2px; }
+
+  .controls{ display:flex; gap:10px; align-items:center; }
+  .lang-toggle{
+    display:flex; background:var(--surface); border:1px solid var(--line); border-radius:999px; padding:4px; box-shadow:var(--shadow);
+  }
+  .lang-toggle button{
+    border:none; background:transparent; padding:8px 16px; border-radius:999px; font-weight:700; font-size:13px; cursor:pointer;
+    color:var(--ink-soft); transition:.25s;
+  }
+  .lang-toggle button.active{ background:var(--teal-700); color:#fff; }
+
+  .role-toggle{ display:flex; background:var(--teal-100); border-radius:999px; padding:4px; }
+  .role-toggle button{ border:none; background:transparent; padding:8px 14px; border-radius:999px; font-weight:700; font-size:12.5px; cursor:pointer; color:var(--teal-900); }
+  .role-toggle button.active{ background:var(--teal-700); color:#fff; }
+
+  .stage{
+    width:100%; max-width:1040px; display:grid; grid-template-columns:340px 1fr; gap:34px;
+  }
+  @media (max-width:860px){ .stage{ grid-template-columns:1fr; justify-items:center;} }
+
+  /* phone frame */
+  .phone-wrap{ position:sticky; top:24px; }
+  .phone{
+    width:340px; height:700px; background:#0C0F0E; border-radius:44px; padding:14px;
+    box-shadow: var(--shadow), 0 0 0 1px rgba(0,0,0,0.05);
+    position:relative;
+  }
+  .phone .notch{
+    position:absolute; top:14px; left:50%; transform:translateX(-50%);
+    width:120px; height:22px; background:#0C0F0E; border-radius:0 0 16px 16px; z-index:5;
+  }
+  .screen{
+    width:100%; height:100%; background:var(--bg); border-radius:32px; overflow:hidden; position:relative;
+    display:flex; flex-direction:column;
+  }
+  .view{
+    position:absolute; inset:0; display:flex; flex-direction:column; opacity:0; transform:translateY(10px);
+    transition:opacity .28s ease, transform .28s ease; pointer-events:none; overflow-y:auto;
+  }
+  .view.active{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .view::-webkit-scrollbar{ display:none; }
+
+  .status-bar{ height:30px; display:flex; align-items:center; justify-content:space-between; padding:0 22px; font-size:12px; font-weight:700; color:var(--ink); flex-shrink:0;}
+
+  /* ---- shared UI bits ---- */
+  .app-header{ padding:14px 20px 6px; flex-shrink:0; }
+  .app-header h1{ font-size:20px; margin:0 0 2px; font-weight:800; color:var(--teal-900); }
+  .app-header p{ margin:0; font-size:12.5px; color:var(--ink-soft); }
+  .content{ padding:14px 20px 90px; flex:1; }
+
+  .search-pill{
+    display:flex; align-items:center; gap:10px; background:var(--surface); border:1px solid var(--line);
+    border-radius:16px; padding:12px 14px; margin:12px 0 16px; box-shadow:0 4px 14px -8px rgba(0,0,0,.15);
+  }
+  .search-pill svg{ width:18px; height:18px; color:var(--ink-soft); flex-shrink:0; }
+  .search-pill span{ font-size:13px; color:var(--ink-soft); }
+
+  .chip-row{ display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; margin-bottom:18px; }
+  .chip{
+    flex-shrink:0; padding:8px 14px; border-radius:999px; background:var(--surface); border:1px solid var(--line);
+    font-size:12.5px; font-weight:600; color:var(--teal-900); white-space:nowrap; cursor:pointer;
+  }
+  .chip.active{ background:var(--teal-700); color:#fff; border-color:var(--teal-700); }
+
+  .section-title{ display:flex; justify-content:space-between; align-items:baseline; margin:6px 0 12px; }
+  .section-title h2{ font-size:14.5px; font-weight:800; margin:0; }
+  .section-title a{ font-size:12px; color:var(--teal-700); font-weight:700; text-decoration:none; }
+
+  .nurse-card{
+    display:flex; gap:12px; background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md);
+    padding:12px; margin-bottom:10px; cursor:pointer; transition:.2s; box-shadow:0 4px 14px -10px rgba(0,0,0,.12);
+  }
+  .nurse-card:active{ transform:scale(.98); }
+  .avatar{
+    width:52px; height:52px; border-radius:14px; flex-shrink:0; display:flex; align-items:center; justify-content:center;
+    font-weight:800; color:#fff; font-size:17px;
+  }
+  .nc-body{ flex:1; min-width:0; }
+  .nc-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:6px; }
+  .nc-name{ font-size:13.5px; font-weight:800; color:var(--ink); }
+  .nc-badge{ font-size:10px; background:var(--teal-100); color:var(--teal-900); padding:2px 7px; border-radius:6px; font-weight:700; }
+  .nc-spec{ font-size:11.5px; color:var(--ink-soft); margin:2px 0 6px; }
+  .nc-meta{ display:flex; gap:10px; font-size:11px; color:var(--ink-soft); align-items:center; }
+  .star{ color:var(--amber); }
+  .nc-price{ font-size:12.5px; font-weight:800; color:var(--teal-700); }
+
+  .bottom-nav{
+    position:absolute; bottom:0; left:0; right:0; background:var(--surface); border-top:1px solid var(--line);
+    display:flex; padding:8px 6px 14px; z-index:10;
+  }
+  .nav-item{ flex:1; display:flex; flex-direction:column; align-items:center; gap:3px; cursor:pointer; color:var(--ink-soft); }
+  .nav-item svg{ width:21px; height:21px; }
+  .nav-item span{ font-size:9.5px; font-weight:700; }
+  .nav-item.active{ color:var(--teal-700); }
+
+  .btn-primary{
+    background:linear-gradient(135deg,var(--teal-700),var(--teal-900)); color:#fff; border:none; border-radius:14px;
+    padding:14px; font-weight:800; font-size:14px; width:100%; cursor:pointer; box-shadow:0 10px 20px -8px rgba(14,92,83,.5);
+  }
+  .btn-ghost{
+    background:var(--surface); color:var(--teal-900); border:1.5px solid var(--teal-700); border-radius:14px;
+    padding:13px; font-weight:800; font-size:13.5px; width:100%; cursor:pointer;
+  }
+
+  .field{ margin-bottom:12px; }
+  .field label{ font-size:11.5px; font-weight:700; color:var(--ink-soft); display:block; margin-bottom:5px; }
+  .field input{
+    width:100%; border:1.5px solid var(--line); border-radius:12px; padding:12px 14px; font-size:13.5px;
+    font-family:inherit; background:var(--surface); color:var(--ink);
+  }
+  .field input:focus{ outline:2px solid var(--teal-500); outline-offset:1px; border-color:var(--teal-500); }
+
+  .status-track{ display:flex; align-items:center; margin:16px 0 22px; }
+  .status-dot{ width:11px; height:11px; border-radius:50%; background:var(--line); flex-shrink:0; }
+  .status-dot.done{ background:var(--success); }
+  .status-dot.now{ background:var(--amber); box-shadow:0 0 0 4px rgba(245,166,35,.25); }
+  .status-line{ flex:1; height:3px; background:var(--line); }
+  .status-line.done{ background:var(--success); }
+
+  .booking-card{ background:var(--surface); border:1px solid var(--line); border-radius:var(--radius-md); padding:14px; margin-bottom:12px; }
+  .bc-top{ display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; }
+  .status-pill{ font-size:10px; font-weight:800; padding:3px 9px; border-radius:7px; }
+  .sp-active{ background:#FFF4E0; color:var(--amber-dark); }
+  .sp-confirmed{ background:var(--teal-100); color:var(--teal-900); }
+  .sp-reviewed{ background:#E9F8EF; color:var(--success); }
+
+  .bubble{ max-width:76%; padding:10px 13px; border-radius:16px; font-size:12.5px; line-height:1.5; margin-bottom:8px; }
+  .bubble.in{ background:var(--surface); border:1px solid var(--line); align-self:flex-start; border-start-start-radius:4px; }
+  .bubble.out{ background:var(--teal-700); color:#fff; align-self:flex-end; border-start-end-radius:4px; margin-inline-start:auto; }
+  .chat-scroll{ display:flex; flex-direction:column; padding:14px 16px; gap:2px; }
+
+  .profile-hero{ display:flex; flex-direction:column; align-items:center; padding:26px 20px 18px; text-align:center; }
+  .profile-hero .avatar{ width:78px; height:78px; border-radius:22px; font-size:26px; margin-bottom:10px; }
+  .stat-row{ display:flex; gap:10px; width:100%; margin-top:14px; }
+  .stat-box{ flex:1; background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:10px; text-align:center; }
+  .stat-box b{ display:block; font-size:15px; color:var(--teal-900); }
+  .stat-box span{ font-size:10px; color:var(--ink-soft); }
+
+  .menu-item{ display:flex; align-items:center; gap:12px; padding:13px 4px; border-bottom:1px solid var(--line); font-size:13px; font-weight:600; cursor:pointer; }
+  .menu-item svg{ width:18px; height:18px; color:var(--teal-700); }
+  .menu-item .chev{ margin-inline-start:auto; color:var(--ink-soft); }
+
+  /* right side: design notes */
+  .notes{ padding:6px 4px; }
+  .notes h2{ font-family:'Manrope',sans-serif; font-size:22px; color:var(--teal-900); margin:0 0 4px;}
+  [dir="rtl"] .notes h2{ font-family:'Cairo',sans-serif; }
+  .notes p.lead{ color:var(--ink-soft); font-size:14px; margin:0 0 22px; max-width:60ch; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-bottom:22px; }
+  @media(max-width:520px){ .grid2{ grid-template-columns:1fr; } }
+  .card{ background:var(--surface); border:1px solid var(--line); border-radius:16px; padding:16px; box-shadow:0 6px 20px -14px rgba(0,0,0,.2); }
+  .card h3{ font-size:13px; margin:0 0 8px; color:var(--teal-900); }
+  .swatches{ display:flex; gap:8px; flex-wrap:wrap; }
+  .sw{ width:38px; height:38px; border-radius:10px; box-shadow:inset 0 0 0 1px rgba(0,0,0,.06); }
+  .tag-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .taglet{ font-size:11px; background:var(--teal-100); color:var(--teal-900); padding:5px 10px; border-radius:999px; font-weight:700; }
+  .screen-nav{ display:flex; gap:8px; flex-wrap:wrap; margin-top:4px; }
+  .screen-nav button{
+    border:1px solid var(--line); background:var(--surface); padding:9px 14px; border-radius:11px; font-size:12.5px;
+    font-weight:700; cursor:pointer; color:var(--ink); transition:.2s;
+  }
+  .screen-nav button.active{ background:var(--teal-700); color:#fff; border-color:var(--teal-700); }
+  small.credit{ color:var(--ink-soft); font-size:11px; display:block; margin-top:22px;}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="brand-row">
+    <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect width="64" height="64" rx="18" fill="url(#g1)"/>
+      <path d="M14 34 L24 34 L28 24 L34 42 L38 30 L41 34 L50 34" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <defs><linearGradient id="g1" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#157A6E"/><stop offset="1" stop-color="#073B35"/>
+      </linearGradient></defs>
+    </svg>
+    <div>
+      <div class="brand-name" data-i18n="brandName">سَنَد</div>
+      <div class="brand-sub" data-i18n="brandSub">رعاية منزلية موثوقة</div>
+    </div>
+  </div>
+  <div class="controls">
+    <div class="role-toggle">
+      <button class="active" data-role="patient" data-i18n="rolePatient">مريض</button>
+      <button data-role="nurse" data-i18n="roleNurse">ممرض/ة</button>
+    </div>
+    <div class="lang-toggle">
+      <button class="active" data-lang="ar">AR</button>
+      <button data-lang="en">EN</button>
+    </div>
+  </div>
+</div>
+
+<div class="stage">
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="screen">
+
+        <!-- HOME -->
+        <div class="view active" data-view="home">
+          <div class="status-bar"><span>9:41</span><span>●●●  🔋</span></div>
+          <div class="app-header">
+            <h1 data-i18n="homeGreeting">أهلاً يا سارة 👋</h1>
+            <p data-i18n="homeSub">مين هنطلب النهاردة؟</p>
+          </div>
+          <div class="content">
+            <div class="search-pill">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+              <span data-i18n="searchPh">دوّر باسم التخصص أو المنطقة…</span>
+            </div>
+            <div class="chip-row" id="chipRow"></div>
+            <div class="section-title">
+              <h2 data-i18n="topRated">الأعلى تقييماً بالقرب منك</h2>
+              <a href="#" data-i18n="seeAll">عرض الكل</a>
+            </div>
+            <div id="nurseList"></div>
+          </div>
+        </div>
+
+        <!-- NURSE PROFILE -->
+        <div class="view" data-view="nurse">
+          <div class="status-bar"><span>9:41</span><span>●●●  🔋</span></div>
+          <div class="content" style="padding-top:14px;">
+            <div style="display:flex;gap:12px;align-items:center;margin-bottom:14px;">
+              <div class="avatar" style="background:linear-gradient(135deg,#157A6E,#073B35);width:64px;height:64px;border-radius:18px;font-size:22px;">هـ</div>
+              <div>
+                <div class="nc-name" style="font-size:16px;" data-i18n="n1Name">هبة السيد</div>
+                <div class="nc-spec" data-i18n="n1Spec">تمريض رعاية مسنين — 6 سنوات خبرة</div>
+                <div class="nc-meta"><span class="star">★★★★★</span><span>5.0 (128)</span></div>
+              </div>
+            </div>
+            <div class="grid2" style="margin-bottom:16px;">
+              <div class="card" style="padding:12px;"><h3 style="margin-bottom:2px;" data-i18n="verified">موثّقة</h3><span style="font-size:11px;color:var(--ink-soft)" data-i18n="verifiedSub">مستندات مُراجعة</span></div>
+              <div class="card" style="padding:12px;"><h3 style="margin-bottom:2px;" data-i18n="responseTime">سرعة الرد</h3><span style="font-size:11px;color:var(--ink-soft)">&lt; 15 <span data-i18n="min">دقيقة</span></span></div>
+            </div>
+            <div class="section-title"><h2 data-i18n="about">نبذة</h2></div>
+            <p style="font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin-bottom:16px;" data-i18n="n1About">متخصصة في رعاية كبار السن وحالات ما بعد الجراحة، بأسلوب هادئ وصبور مع المرضى وأسرهم.</p>
+            <div class="section-title"><h2 data-i18n="reviewsTitle">آراء المرضى</h2></div>
+            <div class="card" style="margin-bottom:80px;">
+              <div style="display:flex;justify-content:space-between;"><b style="font-size:12.5px;" data-i18n="r1Name">أ. محمود</b><span class="star" style="font-size:11px;">★★★★★</span></div>
+              <p style="font-size:12px;color:var(--ink-soft);margin:6px 0 0;" data-i18n="r1Text">تعامل راقي واهتمام حقيقي بوالدتي، شكراً سند.</p>
+            </div>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:14px 20px 22px;background:linear-gradient(0deg,var(--bg) 60%,transparent);">
+            <button class="btn-primary" data-i18n="bookNow">احجز الآن — 350 ج.م</button>
+          </div>
+        </div>
+
+        <!-- BOOKINGS -->
+        <div class="view" data-view="bookings">
+          <div class="status-bar"><span>9:41</span><span>●●●  🔋</span></div>
+          <div class="app-header"><h1 data-i18n="myBookings">حجوزاتي</h1></div>
+          <div class="content">
+            <div class="booking-card">
+              <div class="bc-top">
+                <span class="status-pill sp-active" data-i18n="stActive">جارية الآن</span>
+                <span style="font-size:11px;color:var(--ink-soft);" data-i18n="today">اليوم</span>
+              </div>
+              <div class="nc-name" data-i18n="n2Name">مايكل عادل</div>
+              <div class="nc-spec" data-i18n="care1">رعاية ما بعد العمليات</div>
+              <div class="status-track">
+                <div class="status-dot done"></div><div class="status-line done"></div>
+                <div class="status-dot done"></div><div class="status-line done"></div>
+                <div class="status-dot now"></div><div class="status-line"></div>
+                <div class="status-dot"></div>
+              </div>
+            </div>
+            <div class="booking-card">
+              <div class="bc-top">
+                <span class="status-pill sp-confirmed" data-i18n="stConfirmed">مؤكد</span>
+                <span style="font-size:11px;color:var(--ink-soft);" data-i18n="tomorrow">غداً 4:00 م</span>
+              </div>
+              <div class="nc-name" data-i18n="n3Name">رنا فتحي</div>
+              <div class="nc-spec" data-i18n="care2">متابعة سكر وضغط</div>
+            </div>
+            <div class="booking-card">
+              <div class="bc-top">
+                <span class="status-pill sp-reviewed" data-i18n="stReviewed">مكتملة</span>
+                <span style="font-size:11px;color:var(--ink-soft);" data-i18n="lastWeek">الأسبوع الماضي</span>
+              </div>
+              <div class="nc-name" data-i18n="n1Name">هبة السيد</div>
+              <div class="nc-meta" style="margin-top:4px;"><span class="star">★★★★★</span><span data-i18n="yourReview">تقييمك: ٥/٥</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- CHAT -->
+        <div class="view" data-view="chat">
+          <div class="status-bar"><span>9:41</span><span>●●●  🔋</span></div>
+          <div class="app-header"><h1 style="font-size:16px;" data-i18n="n2Name">مايكل عادل</h1><p data-i18n="onlineNow">متصل الآن</p></div>
+          <div class="chat-scroll">
+            <div class="bubble in" data-i18n="c1">هوصل عندكوا الساعة ٤، معايا كل الأدوات.</div>
+            <div class="bubble out" data-i18n="c2">تمام يا مايكل، البواب هيكون في استقبالك.</div>
+            <div class="bubble in" data-i18n="c3">تمام، شكراً 🙏</div>
+          </div>
+          <div style="position:absolute;bottom:0;left:0;right:0;padding:10px 14px 20px;background:var(--surface);border-top:1px solid var(--line);display:flex;gap:8px;">
+            <div style="flex:1;background:var(--bg);border-radius:14px;padding:11px 14px;font-size:12px;color:var(--ink-soft);" data-i18n="typeMsg">اكتب رسالة…</div>
+            <div style="width:38px;height:38px;background:var(--teal-700);border-radius:12px;display:flex;align-items:center;justify-content:center;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="#fff" style="transform:rotate(180deg)"><path d="M2 21l21-9L2 3v7l15 2-15 2z"/></svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- PROFILE -->
+        <div class="view" data-view="profile">
+          <div class="status-bar"><span>9:41</span><span>●●●  🔋</span></div>
+          <div class="profile-hero">
+            <div class="avatar" style="background:linear-gradient(135deg,var(--amber),var(--amber-dark));">س</div>
+            <div class="nc-name" style="font-size:15px;" data-i18n="userName">سارة إبراهيم</div>
+            <span style="font-size:11.5px;color:var(--ink-soft);">sara@email.com</span>
+            <div class="stat-row">
+              <div class="stat-box"><b>12</b><span data-i18n="statBookings">حجز</span></div>
+              <div class="stat-box"><b>4.9</b><span data-i18n="statRating">تقييمها</span></div>
+              <div class="stat-box"><b>AR</b><span data-i18n="statLang">اللغة</span></div>
+            </div>
+          </div>
+          <div class="content" style="padding-top:6px;">
+            <div class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg><span data-i18n="mAccount">بيانات الحساب</span><span class="chev">›</span></div>
+            <div class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12h18M3 6h18M3 18h18"/></svg><span data-i18n="mLang">اللغة / Language</span><span class="chev">›</span></div>
+            <div class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg><span data-i18n="mPrivacy">الخصوصية والأمان</span><span class="chev">›</span></div>
+            <div class="menu-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 16v-4M12 8h.01"/><circle cx="12" cy="12" r="9"/></svg><span data-i18n="mHelp">المساعدة والدعم</span><span class="chev">›</span></div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="bottom-nav">
+        <div class="nav-item active" data-nav="home">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12l9-9 9 9M5 10v10h14V10"/></svg>
+          <span data-i18n="navHome">الرئيسية</span>
+        </div>
+        <div class="nav-item" data-nav="bookings">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="5" width="16" height="16" rx="2"/><path d="M8 3v4M16 3v4M4 10h16"/></svg>
+          <span data-i18n="navBookings">حجوزاتي</span>
+        </div>
+        <div class="nav-item" data-nav="chat">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <span data-i18n="navChat">الدردشة</span>
+        </div>
+        <div class="nav-item" data-nav="profile">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+          <span data-i18n="navProfile">حسابي</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="notes">
+    <h2 data-i18n="notesTitle">سَنَد — نظام تصميم التطبيق</h2>
+    <p class="lead" data-i18n="notesLead">هوية بصرية هادئة وموثوقة لسوق الرعاية التمريضية المنزلية، تدعم العربية (RTL) والإنجليزية (LTR) بالكامل، مبنية على شبكة تنقل سفلية ثابتة لاستجابة فورية بلا إعادة تحميل.</p>
+
+    <div class="grid2">
+      <div class="card">
+        <h3 data-i18n="colorTitle">الألوان</h3>
+        <div class="swatches">
+          <div class="sw" style="background:#073B35"></div>
+          <div class="sw" style="background:#0E5C53"></div>
+          <div class="sw" style="background:#F5A623"></div>
+          <div class="sw" style="background:#DEEFEC"></div>
+          <div class="sw" style="background:#FAFAF8;border:1px solid #eee"></div>
+        </div>
+      </div>
+      <div class="card">
+        <h3 data-i18n="typeTitle">الخطوط</h3>
+        <div class="tag-row">
+          <span class="taglet">Cairo — عربي</span>
+          <span class="taglet">Manrope — EN</span>
+          <span class="taglet">Inter — Body</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:22px;">
+      <h3 data-i18n="tryTitle">جرّب الشاشات</h3>
+      <div class="screen-nav" id="screenNav"></div>
+    </div>
+
+    <div class="card">
+      <h3 data-i18n="signatureTitle">العنصر المميز</h3>
+      <p style="font-size:12.5px;color:var(--ink-soft);line-height:1.7;margin:0;" data-i18n="signatureBody">شعار "سَنَد" عبارة عن خط نبض (heartbeat line) داخل منزل مُبسّط — يربط بصرياً بين المتابعة الصحية والدفء الإنساني للرعاية المنزلية، ويظهر كموتيف متكرر في مؤشرات الحالة والتحميل.</p>
+    </div>
+    <small class="credit">Prototype · HTML/CSS/JS · no external UI kit · RTL-mirrored automatically via CSS logical properties</small>
+  </div>
+</div>
+
+<script>
+const dict = {
+  ar: {
+    brandName:"سَنَد", brandSub:"رعاية منزلية موثوقة",
+    rolePatient:"مريض", roleNurse:"ممرض/ة",
+    homeGreeting:"أهلاً يا سارة 👋", homeSub:"مين هنطلب النهاردة؟",
+    searchPh:"دوّر باسم التخصص أو المنطقة…",
+    topRated:"الأعلى تقييماً بالقرب منك", seeAll:"عرض الكل",
+    verified:"موثّقة", verifiedSub:"مستندات مُراجعة", responseTime:"سرعة الرد", min:"دقيقة",
+    about:"نبذة", n1About:"متخصصة في رعاية كبار السن وحالات ما بعد الجراحة، بأسلوب هادئ وصبور مع المرضى وأسرهم.",
+    reviewsTitle:"آراء المرضى", r1Name:"أ. محمود", r1Text:"تعامل راقي واهتمام حقيقي بوالدتي، شكراً سند.",
+    bookNow:"احجز الآن — 350 ج.م",
+    myBookings:"حجوزاتي", stActive:"جارية الآن", today:"اليوم", stConfirmed:"مؤكد", tomorrow:"غداً 4:00 م",
+    stReviewed:"مكتملة", lastWeek:"الأسبوع الماضي", yourReview:"تقييمك: ٥/٥",
+    care1:"رعاية ما بعد العمليات", care2:"متابعة سكر وضغط",
+    onlineNow:"متصل الآن", typeMsg:"اكتب رسالة…",
+    c1:"هوصل عندكوا الساعة ٤، معايا كل الأدوات.", c2:"تمام يا مايكل، البواب هيكون في استقبالك.", c3:"تمام، شكراً 🙏",
+    userName:"سارة إبراهيم", statBookings:"حجز", statRating:"تقييمها", statLang:"اللغة",
+    mAccount:"بيانات الحساب", mLang:"اللغة / Language", mPrivacy:"الخصوصية والأمان", mHelp:"المساعدة والدعم",
+    navHome:"الرئيسية", navBookings:"حجوزاتي", navChat:"الدردشة", navProfile:"حسابي",
+    n1Name:"هبة السيد", n1Spec:"تمريض رعاية مسنين — 6 سنوات خبرة",
+    n2Name:"مايكل عادل", n3Name:"رنا فتحي",
+    notesTitle:"سَنَد — نظام تصميم التطبيق",
+    notesLead:"هوية بصرية هادئة وموثوقة لسوق الرعاية التمريضية المنزلية، تدعم العربية (RTL) والإنجليزية (LTR) بالكامل، مبنية على شبكة تنقل سفلية ثابتة لاستجابة فورية بلا إعادة تحميل.",
+    colorTitle:"الألوان", typeTitle:"الخطوط", tryTitle:"جرّب الشاشات",
+    signatureTitle:"العنصر المميز",
+    signatureBody:"شعار \"سَنَد\" عبارة عن خط نبض (heartbeat line) داخل منزل مُبسّط — يربط بصرياً بين المتابعة الصحية والدفء الإنساني للرعاية المنزلية، ويظهر كموتيف متكرر في مؤشرات الحالة والتحميل.",
+    chipHome:"عناية مسنين", chipPost:"ما بعد عملية", chipPed:"رعاية أطفال", chipChronic:"أمراض مزمنة", chipPhysio:"علاج طبيعي"
+  },
+  en: {
+    brandName:"Sanad", brandSub:"Trusted home care",
+    rolePatient:"Patient", roleNurse:"Nurse",
+    homeGreeting:"Hi Sara 👋", homeSub:"Who do we need today?",
+    searchPh:"Search a specialty or area…",
+    topRated:"Top rated near you", seeAll:"See all",
+    verified:"Verified", verifiedSub:"Documents reviewed", responseTime:"Response time", min:"min",
+    about:"About", n1About:"Specializes in elderly and post-surgical care, with a calm, patient approach for patients and families.",
+    reviewsTitle:"Patient reviews", r1Name:"A. Mahmoud", r1Text:"Genuinely caring with my mother — thank you, Sanad.",
+    bookNow:"Book now — 350 EGP",
+    myBookings:"My bookings", stActive:"In progress", today:"Today", stConfirmed:"Confirmed", tomorrow:"Tomorrow 4:00 PM",
+    stReviewed:"Completed", lastWeek:"Last week", yourReview:"Your rating: 5/5",
+    care1:"Post-operative care", care2:"Diabetes & BP follow-up",
+    onlineNow:"Online now", typeMsg:"Type a message…",
+    c1:"I'll be there at 4, bringing all the equipment.", c2:"Great, the doorman will be expecting you.", c3:"Perfect, thank you 🙏",
+    userName:"Sara Ibrahim", statBookings:"Bookings", statRating:"Rating", statLang:"Language",
+    mAccount:"Account details", mLang:"Language", mPrivacy:"Privacy & security", mHelp:"Help & support",
+    navHome:"Home", navBookings:"Bookings", navChat:"Chat", navProfile:"Profile",
+    n1Name:"Heba El-Sayed", n1Spec:"Elderly care nursing — 6 yrs experience",
+    n2Name:"Michael Adel", n3Name:"Rana Fathy",
+    notesTitle:"Sanad — App Design System",
+    notesLead:"A calm, trustworthy visual identity for a home-nursing marketplace, fully bilingual (Arabic RTL / English LTR), built on a fixed bottom-nav shell for instant, reload-free navigation.",
+    colorTitle:"Color", typeTitle:"Type", tryTitle:"Try the screens",
+    signatureTitle:"Signature element",
+    signatureBody:"The Sanad mark is a heartbeat line traced inside a simplified home — visually linking vital-signs monitoring with the human warmth of home care, echoed as a recurring motif in status and loading states.",
+    chipHome:"Elder care", chipPost:"Post-op", chipPed:"Pediatric", chipChronic:"Chronic illness", chipPhysio:"Physiotherapy"
+  }
+};
+const nurses = [
+  {key:"n1Name", spec:"n1Spec", init:"هـ", initEn:"H", rating:"5.0 (128)", price:"350", color:"linear-gradient(135deg,#157A6E,#073B35)"},
+  {key:"n2Name", spec:"care1", init:"م", initEn:"M", rating:"4.9 (76)", price:"420", color:"linear-gradient(135deg,#F5A623,#D98B0E)"},
+  {key:"n3Name", spec:"care2", init:"ر", initEn:"R", rating:"4.8 (54)", price:"300", color:"linear-gradient(135deg,#5B8DEF,#2F5FC7)"}
+];
+const chips = ["chipHome","chipPost","chipPed","chipChronic","chipPhysio"];
+let lang = "ar";
+
+function t(k){ return dict[lang][k] || k; }
+
+function renderChips(){
+  document.getElementById("chipRow").innerHTML = chips.map((c,i)=>
+    `<div class="chip ${i===0?'active':''}" data-i18n="${c}">${t(c)}</div>`).join("");
+}
+function renderNurses(){
+  document.getElementById("nurseList").innerHTML = nurses.map(n=>`
+    <div class="nurse-card" data-goto="nurse">
+      <div class="avatar" style="background:${n.color}">${lang==='ar'?n.init:n.initEn}</div>
+      <div class="nc-body">
+        <div class="nc-top">
+          <span class="nc-name" data-i18n="${n.key}">${t(n.key)}</span>
+          <span class="nc-badge" data-i18n="verified">${t('verified')}</span>
+        </div>
+        <div class="nc-spec" data-i18n="${n.spec}">${t(n.spec)}</div>
+        <div class="nc-meta"><span class="star">★★★★★</span><span>${n.rating}</span><span class="nc-price" style="margin-inline-start:auto">${n.price} ${lang==='ar'?'ج.م':'EGP'}</span></div>
+      </div>
+    </div>`).join("");
+  document.querySelectorAll('[data-goto]').forEach(el=>el.addEventListener('click',()=>showView(el.dataset.goto)));
+}
+function renderScreenNav(){
+  const views = [["home","navHome"],["nurse","reviewsTitle"],["bookings","navBookings"],["chat","navChat"],["profile","navProfile"]];
+  document.getElementById("screenNav").innerHTML = views.map(([v,label],i)=>
+    `<button data-nav="${v}" class="${i===0?'active':''}">${t(label)}</button>`).join("");
+  document.querySelectorAll('#screenNav button').forEach(b=>b.addEventListener('click',()=>showView(b.dataset.nav)));
+}
+
+function applyI18n(){
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const k = el.getAttribute('data-i18n');
+    if(dict[lang][k]) el.textContent = dict[lang][k];
+  });
+}
+
+function setLang(l){
+  lang = l;
+  document.documentElement.lang = l;
+  document.documentElement.dir = l === 'ar' ? 'rtl' : 'ltr';
+  document.querySelectorAll('.lang-toggle button').forEach(b=>b.classList.toggle('active', b.dataset.lang===l));
+  applyI18n();
+  renderChips();
+  renderNurses();
+  renderScreenNav();
+}
+
+function showView(name){
+  document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active', v.dataset.view===name));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.toggle('active', n.dataset.nav===name));
+  document.querySelectorAll('#screenNav button').forEach(b=>b.classList.toggle('active', b.dataset.nav===name));
+}
+
+document.querySelectorAll('.lang-toggle button').forEach(b=>b.addEventListener('click',()=>setLang(b.dataset.lang)));
+document.querySelectorAll('.nav-item').forEach(n=>n.addEventListener('click',()=>showView(n.dataset.nav)));
+document.querySelectorAll('.role-toggle button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('.role-toggle button').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+}));
+
+setLang('ar');
+</script>
+</body>
+</html>

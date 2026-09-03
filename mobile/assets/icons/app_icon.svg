@@ -1,0 +1,16 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="512" y2="512" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#157A6E"/>
+      <stop offset="1" stop-color="#073B35"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="128" fill="url(#bg)"/>
+  <!-- simplified home outline -->
+  <path d="M256 96 L400 210 V400 A16 16 0 0 1 384 416 H128 A16 16 0 0 1 112 400 V210 Z"
+        fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round" opacity="0.28"/>
+  <!-- heartbeat / pulse line forming a heart peak -->
+  <path d="M104 288 L176 288 L204 232 L236 336 L262 260 L284 296 L340 296 L408 288"
+        fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="408" cy="288" r="9" fill="#F5A623"/>
+</svg>

@@ -1,0 +1,10 @@
+<svg width="1024" height="1024" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!-- Foreground-only mark for Android adaptive icons (no background rect —
+       the OS composites this over its own background layer / mask shape).
+       Same geometry as sanad-logo.svg, just without the rounded-square fill. -->
+  <path d="M256 96 L400 210 V400 A16 16 0 0 1 384 416 H128 A16 16 0 0 1 112 400 V210 Z"
+        fill="none" stroke="#FFFFFF" stroke-width="14" stroke-linejoin="round" opacity="0.35"/>
+  <path d="M104 288 L176 288 L204 232 L236 336 L262 260 L284 296 L340 296 L408 288"
+        fill="none" stroke="#FFFFFF" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="408" cy="288" r="9" fill="#F5A623"/>
+</svg>
