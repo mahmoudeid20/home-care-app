@@ -5,9 +5,8 @@ class Env {
 
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    // Uses the machine's local Wi-Fi IP so the app works seamlessly on physical
-    // Android mobile devices as well as emulators and desktop.
-    defaultValue: 'http://192.168.1.10:8000/api/v1',
+    // Connected to the 24/7 cloud backend on Hugging Face
+    defaultValue: 'https://mahmoudeid205-homecare-api.hf.space/api/v1',
   );
 
   /// The WebSocket chat route (app/websocket/chat_ws.py) is mounted at the
