@@ -1,5 +1,6 @@
 import sys
 from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 # Add backend directory to sys.path
 backend_dir = Path(__file__).resolve().parent / "backend"
@@ -8,25 +9,29 @@ if str(backend_dir) not in sys.path:
 
 import gradio as gr
 import spaces
+import uvicorn
 from app.main import app as fastapi_app
 
 # Active ZeroGPU function required by Hugging Face ZeroGPU runtime
 @spaces.GPU
-def server_ping():
-    return "Home Care Cloud Server is Active & Healthy • FastAPI + WebSockets"
+def server_status(name: str = "Client"):
+    return f"Home Care Cloud Backend is Online for {name} • FastAPI + WebSockets Active"
 
-with gr.Blocks(title="Home Care API") as demo:
-    gr.Markdown("# 🏥 Home Care API")
-    gr.Markdown("The backend server for the Home Care application is **running and healthy 24/7**.")
-    out = gr.Textbox(value="Status: Online • Connected to Cloud", label="Server Status", interactive=False)
-    btn = gr.Button("Ping Server")
-    btn.click(fn=server_ping, inputs=[], outputs=out)
+# Gradio Interface that registers the ZeroGPU function
+demo = gr.Interface(
+    fn=server_status,
+    inputs="text",
+    outputs="text",
+    title="Home Care API Status",
+    description="Backend service for Home Care application running 24/7."
+)
 
-# Mount all FastAPI routes into Gradio's router (evaluated first)
-demo.app.router.routes = list(fastapi_app.routes) + list(demo.app.router.routes)
+# Mount Gradio onto the root FastAPI application at /gradio
+# This ensures all /api/v1/... and /health and /ws/... routes belong directly to FastAPI!
+app = gr.mount_gradio_app(fastapi_app, demo, path="/gradio")
 
 # Auto-create database tables on startup
-@demo.app.on_event("startup")
+@app.on_event("startup")
 async def _init_db():
     from app.core.database import engine, Base
     from app import models
@@ -36,4 +41,5 @@ async def _init_db():
     except Exception as e:
         print("DB init error:", e)
 
-demo.queue().launch(server_name="0.0.0.0", server_port=7860)
+if __name__ == "__main__":
+    uvicorn.run(app, host="0.0.0.0", port=7860)
