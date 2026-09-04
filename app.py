@@ -6,26 +6,23 @@ backend_dir = Path(__file__).resolve().parent / "backend"
 if str(backend_dir) not in sys.path:
     sys.path.insert(0, str(backend_dir))
 
-# Required by Hugging Face ZeroGPU runtime
-try:
-    import spaces
-
-    @spaces.GPU
-    def _zero_gpu_init():
-        """Satisfies ZeroGPU startup check for Hugging Face Spaces."""
-        return True
-except Exception:
-    pass
-
 import gradio as gr
+import spaces
 import uvicorn
 from app.main import app as fastapi_app
+
+# ZeroGPU requires an active function registered on a Gradio component
+@spaces.GPU
+def server_status():
+    return "Online • FastAPI + WebSockets ready • 24/7 Cloud"
 
 # Create a clean status dashboard for Gradio
 with gr.Blocks(title="Home Care API") as demo:
     gr.Markdown("# 🏥 Home Care API")
     gr.Markdown("The backend server for the Home Care application is **running and healthy**.")
-    status_box = gr.Textbox(value="Status: Online (FastAPI + WebSockets)", label="Health Check", interactive=False)
+    status_display = gr.Textbox(value="Online • FastAPI + WebSockets ready", label="Server Status", interactive=False)
+    refresh_btn = gr.Button("Ping Server")
+    refresh_btn.click(fn=server_status, inputs=[], outputs=status_display)
 
 # Mount Gradio at /dashboard, while the entire root / and /api/v1 belongs to FastAPI!
 app = gr.mount_gradio_app(fastapi_app, demo, path="/dashboard")
